@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOaja - Cleaning Service Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Simulasi Layar HP */
+        .phone-container {
+            width: 100%;
+            max-width: 450px;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Banner Atas */
+        .banner {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px 20px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            text-align: center;
+        }
+
+        .banner h2 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .banner p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Section Menu Utama */
+        .section-title {
+            padding: 20px 20px 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 10px 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .icon-wrapper {
+            width: 55px;
+            height: 55px;
+            background-color: #e8f0fe;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .menu-item:hover .icon-wrapper {
+            transform: scale(1.05);
+        }
+
+        .icon-wrapper i {
+            font-size: 1.4rem;
+            color: #1e3c72;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4d4d;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .menu-item span {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Hasil Pekerjaan Hari Ini */
+        .job-card {
+            background: #fff;
+            border: 1px solid #eef0f4;
+            border-radius: 12px;
+            margin: 10px 20px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .status-done {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .job-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-around;
+            background: #fff;
+            padding: 12px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #888;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #1e3c72;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        
+        <div class="banner">
+            <h2>Mona Siap Membantu</h2>
+            <p>Sistem Manajemen Kebersihan & Cleaning Service</p>
+        </div>
+
+        <div class="section-title">Kebutuhan Operasional</div>
+        <div class="menu-grid">
+            <div class="menu-item">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-list-check"></i>
+                    <div class="badge">5</div>
+                </div>
+                <span>Tugas Hari Ini</span>
+            </div>
+            <div class="menu-item">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <span>Lapor Isu</span>
+            </div>
+            <div class="menu-item">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-square-poll-horizontal"></i>
+                </div>
+                <span>Status Area</span>
+            </div>
+            <div class="menu-item">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-bucket"></i>
+                </div>
+                <span>Stok Alat</span>
+            </div>
+        </div>
+
+        <div class="section-title">Hasil Pekerjaan Hari Ini</div>
+        
+        <div class="job-card">
+            <div class="job-header">
+                <strong>Ruang Meeting Utama (Lantai 2)</strong>
+                <span class="status-done">Selesai</span>
+            </div>
+            <div class="job-details">
+                <p><i class="fa-regular fa-clock"></i> Selesai pada: 10:30 WIB</p>
+                <p><i class="fa-regular fa-user"></i> Petugas: Budi Santoso</p>
+                <p><i class="fa-regular fa-star"></i> Rating Klien: ⭐⭐⭐⭐⭐ (Sangat Bersih)</p>
+            </div>
+        </div>
+
+        <div class="job-card">
+            <div class="job-header">
+                <strong>Lobby & Area Resepsionis</strong>
+                <span class="status-done">Selesai</span>
+            </div>
+            <div class="job-details">
+                <p><i class="fa-regular fa-clock"></i> Selesai pada: 08:15 WIB</p>
+                <p><i class="fa-regular fa-user"></i> Petugas: Siti Aminah</p>
+                <p><i class="fa-regular fa-star"></i> Rating Klien: ⭐⭐⭐⭐☆ (Wangi)</p>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fa-solid fa-house"></i>
+                <span>Beranda</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Aktivitas</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-user"></i>
+                <span>Akun</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
