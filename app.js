@@ -5,12 +5,12 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from
 // ⚠️ ISI DENGAN DATA DARI FIREBASE CONSOLE KAMU
 // =================================================================
 const firebaseConfig = {
-    apiKey: "PASTE_API_KEY_KAMU_DI_SINI",
-    authDomain: "PROJECT_ID_KAMU.firebaseapp.com",
-    projectId: "PROJECT_ID_KAMU",
-    storageBucket: "PROJECT_ID_KAMU.appspot.com",
-    messagingSenderId: "NOMOR_SENDER_KAMU",
-    appId: "APP_ID_KAMU"
+  apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
+  authDomain: "clean-isabel-app-eaca6.firebaseapp.com",
+  projectId: "clean-isabel-app-eaca6",
+  storageBucket: "clean-isabel-app-eaca6.firebasestorage.app",
+  messagingSenderId: "929083923327",
+  appId: "1:929083923327:web:3ebff1bbdd42eb3494984a"
 };
 
 const app = initializeApp(firebaseConfig);
