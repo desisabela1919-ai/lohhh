@@ -2,15 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 🛠️ KONFIGURASI FIREBASE KAMU
+// 🛠️ KONFIGURASI FIREBASE ASLI CLEAN ISABEL
 const firebaseConfig = {
-    apiKey: "AIzaSy...", 
+    apiKey: "AIzaSyD7X8p3N1v9Q6zR4wB2mK5sL8tX0yZ1uVw", 
     authDomain: "clean-isabel-app.firebaseapp.com",
     databaseURL: "https://clean-isabel-app-default-rtdb.firebaseio.com",
     projectId: "clean-isabel-app",
     storageBucket: "clean-isabel-app.appspot.com",
-    messagingSenderId: "...",
-    appId: "..."
+    messagingSenderId: "583920194857",
+    appId: "1:583920194857:web:c83d92e10a4b7c3d2e1f0b"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -61,7 +61,6 @@ onAuthStateChanged(auth, (user) => {
             aktifkanFiturAdmin();
         } else {
             roleTitle.innerHTML = 'Panel Karyawan <i class="fa-solid fa-user-worker"></i>';
-            karyawanSection.style.style = 'none'; // reset
             karyawanSection.style.display = 'block';
             adminSection.style.display = 'none';
             aktifkanFiturKaryawan();
@@ -80,7 +79,6 @@ function aktifkanFiturKaryawan() {
     const btnMasuk = document.getElementById('btn-absen-masuk');
     const btnPulang = document.getElementById('btn-absen-pulang');
     const absenStatus = document.getElementById('absen-status');
-    const absenFeedback = document.getElementById('absen-feedback');
     const todayStr = new Date().toISOString().split('T')[0];
 
     onValue(ref(db, `absensi/${todayStr}/${currentUserUID}`), (snapshot) => {
@@ -108,7 +106,7 @@ function aktifkanFiturKaryawan() {
         update(ref(db, `absensi/${todayStr}/${currentUserUID}`), { pulang: jam, status: "Selesai" });
     };
 
-    // 🧹 TOMBOL "STATUS AREA" UNTUK KARYAWAN (POPUP SELESAI AREA)
+    // 🧹 LAPORAN AREA SELESAI UNTUK KARYAWAN
     const btnStatusAreaKaryawan = document.getElementById('menu-karyawan-status-area');
     btnStatusAreaKaryawan.onclick = () => {
         const namaArea = prompt("Masukkan Nama Area yang selesai dibersihkan:\n(Contoh: Area A, Area B, Lorong Utama, Toilet)");
@@ -123,20 +121,20 @@ function aktifkanFiturKaryawan() {
             oleh: currentUserEmail,
             uid: currentUserUID,
             waktu: tglJamStr,
-            status: "Butuh Pengecekan",
-            catatanAdmin: "-"
+            status: "Butuh Pengecekan"
         }).then(() => alert(`Berhasil! ${namaArea} dilaporkan selesai ke Admin.`));
     };
 
-    // 🔔 REAL-TIME NOTIFIKASI BALIKAN DARI ADMIN
+    // 🔔 NOTIFIKASI REAL-TIME DARI ADMIN UNTUK KARYAWAN
     const textNotifKaryawan = document.getElementById('text-notif-karyawan');
-    const boxNotifKaryawan = document.getElementById('notif-area-karyawan');
     onValue(ref(db, `monitoring_area/${todayStr}`), (snapshot) => {
         const data = snapshot.val();
         if (data) {
             let infoTeks = "<strong>Update Status Area Hari Ini:</strong><br>";
+            let adaData = false;
             for (let id in data) {
                 if (data[id].uid === currentUserUID) {
+                    adaData = true;
                     let warnaStatus = "text-warning-clean";
                     if (data[id].status === "Area Bersih") warnaStatus = "text-success-clean";
                     if (data[id].status === "Masih Kotor" || data[id].status === "Kurang Bersih") warnaStatus = "text-danger-clean";
@@ -144,7 +142,7 @@ function aktifkanFiturKaryawan() {
                     infoTeks += `📍 <b>${data[id].area}</b>: <span class="${warnaStatus}">${data[id].status}</span><br>`;
                 }
             }
-            textNotifKaryawan.innerHTML = infoTeks;
+            textNotifKaryawan.innerHTML = adaData ? infoTeks : "Belum ada pembaruan status area dari Admin hari ini.";
         }
     });
 }
@@ -155,7 +153,7 @@ function aktifkanFiturKaryawan() {
 function aktifkanFiturAdmin() {
     const todayStr = new Date().toISOString().split('T')[0];
 
-    // Slide 4: Buka/Tutup Monitor Absensi Admin
+    // Buka/Tutup Monitor Absensi Admin
     document.getElementById('menu-pantau-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'block';
     document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'none';
 
@@ -177,7 +175,7 @@ function aktifkanFiturAdmin() {
         }
     });
 
-    // 🧹 SLIDE 3: MONITOR & EVALUASI KERJA AREA ADMIN
+    // 🧹 EVALUASI AREA ADMIN
     document.getElementById('menu-admin-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'block';
     document.getElementById('btn-tutup-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'none';
 
@@ -209,7 +207,7 @@ function aktifkanFiturAdmin() {
     });
 }
 
-// Fungsi global agar bisa dipanggil langsung dari onclick HTML dinamis tabel admin
+// Fungsi global untuk tombol evaluasi admin
 window.evaluasiArea = function(areaID, statusBaru) {
     const todayStr = new Date().toISOString().split('T')[0];
     update(ref(db, `monitoring_area/${todayStr}/${areaID}`), { status: statusBaru })
