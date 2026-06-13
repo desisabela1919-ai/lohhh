@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 🛠️ KONFIGURASI FIREBASE ASLI CLEAN ISABEL
+// 🛠️ MASUKKAN KODE CONFIG ASLI FIREBASE KAMU DI SINI
 const firebaseConfig = {
   apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
   authDomain: "clean-isabel-app-eaca6.firebaseapp.com",
@@ -34,8 +34,17 @@ const adminSection = document.getElementById('admin-section');
 let currentUserEmail = "";
 let currentUserUID = "";
 
+// Daftar Area Tetap (Biar Karyawan Tinggal Klik, Tidak Ketik Manual)
+const daftarAreaDefault = [
+    { id: "lobby", nama: "Area Lobby" },
+    { id: "toilet", nama: "Toilet & Restroom" },
+    { id: "koridor", nama: "Koridor / Selasar" },
+    { id: "lift", nama: "Area Lift & Tangga" },
+    { id: "luar", nama: "Halaman / Area Luar" }
+];
+
 // ==========================================
-// 🔑 PROSES LOGIN & CEK ROLE USER
+// 🔑 PROSES LOGIN & LOGOUT
 // ==========================================
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -72,14 +81,15 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ==========================================
-// 👷 LOGIKA SISI KARYAWAN
+// 👷 LOGIKA SISI KARYAWAN (PANEL GRID DATA AREA)
 // ==========================================
 function aktifkanFiturKaryawan() {
-    // ⏰ LOGIKA ABSENSI KARYAWAN
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // ⏰ 1. Logika Absensi Karyawan
     const btnMasuk = document.getElementById('btn-absen-masuk');
     const btnPulang = document.getElementById('btn-absen-pulang');
     const absenStatus = document.getElementById('absen-status');
-    const todayStr = new Date().toISOString().split('T')[0];
 
     onValue(ref(db, `absensi/${todayStr}/${currentUserUID}`), (snapshot) => {
         const data = snapshot.val();
@@ -106,49 +116,56 @@ function aktifkanFiturKaryawan() {
         update(ref(db, `absensi/${todayStr}/${currentUserUID}`), { pulang: jam, status: "Selesai" });
     };
 
-    // 🧹 LAPORAN AREA SELESAI UNTUK KARYAWAN
-    const btnStatusAreaKaryawan = document.getElementById('menu-karyawan-status-area');
-    btnStatusAreaKaryawan.onclick = () => {
-        const namaArea = prompt("Masukkan Nama Area yang selesai dibersihkan:\n(Contoh: Area A, Area B, Lorong Utama, Toilet)");
-        if (!namaArea) return;
-
-        const sekarang = new Date();
-        const tglJamStr = sekarang.toLocaleDateString('id-ID') + " - " + sekarang.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        const cleanAreaID = namaArea.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-
-        set(ref(db, `monitoring_area/${todayStr}/${cleanAreaID}`), {
-            area: namaArea,
-            oleh: currentUserEmail,
-            uid: currentUserUID,
-            waktu: tglJamStr,
-            status: "Butuh Pengecekan"
-        }).then(() => alert(`Berhasil! ${namaArea} dilaporkan selesai ke Admin.`));
-    };
-
-    // 🔔 NOTIFIKASI REAL-TIME DARI ADMIN UNTUK KARYAWAN
-    const textNotifKaryawan = document.getElementById('text-notif-karyawan');
+    // 🧹 2. Logika Grid Area Kerja Karyawan
+    const gridAreaKaryawan = document.getElementById('grid-area-karyawan');
+    
     onValue(ref(db, `monitoring_area/${todayStr}`), (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            let infoTeks = "<strong>Update Status Area Hari Ini:</strong><br>";
-            let adaData = false;
-            for (let id in data) {
-                if (data[id].uid === currentUserUID) {
-                    adaData = true;
-                    let warnaStatus = "text-warning-clean";
-                    if (data[id].status === "Area Bersih") warnaStatus = "text-success-clean";
-                    if (data[id].status === "Masih Kotor" || data[id].status === "Kurang Bersih") warnaStatus = "text-danger-clean";
+        const dataHariIni = snapshot.val() || {};
+        gridAreaKaryawan.innerHTML = ""; 
 
-                    infoTeks += `📍 <b>${data[id].area}</b>: <span class="${warnaStatus}">${data[id].status}</span><br>`;
-                }
+        daftarAreaDefault.forEach(area => {
+            const dataArea = dataHariIni[area.id] || { status: "Belum Dikerjakan", keterangan: "-", oleh: "-" };
+            
+            let statusClass = "badge-belum";
+            if (dataArea.status === "Butuh Check Admin") statusClass = "badge-proses";
+            if (dataArea.status === "Area Bersih") statusClass = "badge-bersih";
+            if (dataArea.status === "Kurang Bersih" || dataArea.status === "Masih Kotor") statusClass = "badge-kotor";
+
+            const card = document.createElement('div');
+            card.className = "card-grid-area";
+            card.innerHTML = `
+                <h4>${area.nama}</h4>
+                <p>Status: <span class="badge-status ${statusClass}">${dataArea.status}</span></p>
+                <p class="txt-keterangan">Catatan Admin: <i>${dataArea.keterangan || '-'}</i></p>
+                <p><small>Pekerja: ${dataArea.oleh}</small></p>
+                <button class="btn-lapor-area" id="btn-lapor-${area.id}">Laporkan Selesai Kerja</button>
+            `;
+            gridAreaKaryawan.appendChild(card);
+
+            const btnLapor = document.getElementById(`btn-lapor-${area.id}`);
+            if (dataArea.status === "Area Bersih" || dataArea.status === "Butuh Check Admin") {
+                btnLapor.disabled = true;
+                btnLapor.innerText = "Sudah Dilaporkan";
             }
-            textNotifKaryawan.innerHTML = adaData ? infoTeks : "Belum ada pembaruan status area dari Admin hari ini.";
-        }
+
+            btnLapor.onclick = () => {
+                const sekarang = new Date();
+                const jamStr = sekarang.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                
+                update(ref(db, `monitoring_area/${todayStr}/${area.id}`), {
+                    area: area.nama,
+                    oleh: currentUserEmail.split('@')[0], 
+                    waktu: jamStr,
+                    status: "Butuh Check Admin",
+                    keterangan: dataArea.keterangan || "-"
+                }).then(() => alert(`Berhasil mengirim laporan untuk ${area.nama}`));
+            };
+        });
     });
 }
 
 // ==========================================
-// 👑 LOGIKA SISI ADMIN
+// 👑 LOGIKA SISI ADMIN (PANEL EVALUASI MANUAL)
 // ==========================================
 function aktifkanFiturAdmin() {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -157,6 +174,7 @@ function aktifkanFiturAdmin() {
     document.getElementById('menu-pantau-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'block';
     document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'none';
 
+    // Ambil Data Absen Hari Ini (Berdasarkan UID Akurat)
     onValue(ref(db, `absensi/${todayStr}`), (snapshot) => {
         const data = snapshot.val();
         const tbody = document.getElementById('table-absensi-body');
@@ -175,41 +193,43 @@ function aktifkanFiturAdmin() {
         }
     });
 
-    // 🧹 EVALUASI AREA ADMIN
+    // Evaluasi Area Kerja oleh Admin
     document.getElementById('menu-admin-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'block';
     document.getElementById('btn-tutup-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'none';
 
     onValue(ref(db, `monitoring_area/${todayStr}`), (snapshot) => {
-        const data = snapshot.val();
+        const dataHariIni = snapshot.val() || {};
         const tbody = document.getElementById('table-pantau-area-body');
         tbody.innerHTML = "";
         
-        if (data) {
-            for (let areaID in data) {
-                let statusClass = "text-warning-clean";
-                if (data[areaID].status === "Area Bersih") statusClass = "text-success-clean";
-                if (data[areaID].status === "Kurang Bersih" || data[areaID].status === "Masih Kotor") statusClass = "text-danger-clean";
+        daftarAreaDefault.forEach(area => {
+            const dataArea = dataHariIni[area.id] || { status: "Belum Dikerjakan", keterangan: "-", oleh: "-", waktu: "-" };
+            
+            let statusClass = "text-warning-clean";
+            if (dataArea.status === "Area Bersih") statusClass = "text-success-clean";
+            if (dataArea.status === "Kurang Bersih" || dataArea.status === "Masih Kotor") statusClass = "text-danger-clean";
 
-                tbody.innerHTML += `<tr>
-                    <td><small>${data[areaID].waktu}<br>By: ${data[areaID].oleh}</small></td>
-                    <td><b>${data[areaID].area}</b></td>
-                    <td><span class="${statusClass}">${data[areaID].status}</span></td>
-                    <td>
-                        <button class="btn-evaluasi btn-eval-bersih" onclick="evaluasiArea('${areaID}', 'Area Bersih')">Bersih ✅</button>
-                        <button class="btn-evaluasi btn-eval-kurang" onclick="evaluasiArea('${areaID}', 'Kurang Bersih')">Kurang ⚠️</button>
-                        <button class="btn-evaluasi btn-eval-kotor" onclick="evaluasiArea('${areaID}', 'Masih Kotor')">Kotor ❌</button>
-                    </td>
-                </tr>`;
-            }
-        } else {
-            tbody.innerHTML = `<tr><td colspan="4" class="tabel-kosong">Belum ada laporan penyelesaian area hari ini.</td></tr>`;
-        }
+            tbody.innerHTML += `<tr>
+                <td><small>Jam: ${dataArea.waktu || '-'}<br>Oleh: ${dataArea.oleh || '-'}</small></td>
+                <td><b>${area.nama}</b></td>
+                <td><span class="${statusClass}">${dataArea.status}</span><br><small style="color:#777">Ket: ${dataArea.keterangan}</small></td>
+                <td>
+                    <input type="text" id="input-ket-${area.id}" placeholder="Ketik catatan jika kotor..." value="${dataArea.keterangan !== '-' ? dataArea.keterangan : ''}" class="input-ket-admin"><br>
+                    <button class="btn-evaluasi btn-eval-bersih" onclick="adminEvaluasi('${area.id}', 'Area Bersih')">Bersih ✅</button>
+                    <button class="btn-evaluasi btn-eval-kurang" onclick="adminEvaluasi('${area.id}', 'Kurang Bersih')">Kurang ⚠️</button>
+                    <button class="btn-evaluasi btn-eval-kotor" onclick="adminEvaluasi('${area.id}', 'Masih Kotor')">Kotor ❌</button>
+                </td>
+            </tr>`;
+        });
     });
 }
 
-// Fungsi global untuk tombol evaluasi admin
-window.evaluasiArea = function(areaID, statusBaru) {
+window.adminEvaluasi = function(areaID, statusBaru) {
     const todayStr = new Date().toISOString().split('T')[0];
-    update(ref(db, `monitoring_area/${todayStr}/${areaID}`), { status: statusBaru })
-        .then(() => alert(`Evaluasi disimpan: ${statusBaru}`));
+    const catatanManual = document.getElementById(`input-ket-${areaID}`).value || "-";
+    
+    update(ref(db, `monitoring_area/${todayStr}/${areaID}`), { 
+        status: statusBaru,
+        keterangan: catatanManual
+    }).then(() => alert(`Evaluasi ${statusBaru} Berhasil Disimpan!`));
 };
