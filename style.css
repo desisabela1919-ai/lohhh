@@ -1,186 +1,126 @@
-/* --- Aturan Dasar & Simulasi Layar HP --- */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ========================================== */
+/* 🎨 STYLE UTAMA CLEAN ISABEL APP */
+/* ========================================== */
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    background-color: #f4f6f9; 
+    color: #333; 
 }
-
-body {
-    background-color: #f5f6f8;
-    display: flex;
-    justify-content: center;
+.container { 
+    max-width: 500px; 
+    margin: 0 auto; 
+    background: white; 
+    min-height: 100vh; 
+    position: relative; 
+    box-sizing: border-box; 
+    padding-bottom: 60px; 
 }
-
-.phone-container {
-    width: 100%;
-    max-width: 450px;
-    background: #ffffff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+.banner-user { 
+    background: linear-gradient(135deg, #1e3c72, #2a5298); 
+    color: white; 
+    padding: 20px; 
+    border-bottom-left-radius: 20px; 
+    border-bottom-right-radius: 20px; 
+    position: relative; 
 }
-
-/* --- Tampilan Halaman Login --- */
-.auth-container {
-    padding: 40px 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex: 1;
+.banner-user h2 { margin: 0; font-size: 20px; }
+.banner-user p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.8; }
+.btn-logout-icon { 
+    position: absolute; 
+    top: 25px; 
+    right: 20px; 
+    background: rgba(255,255,255,0.2); 
+    border: none; 
+    color: white; 
+    padding: 10px; 
+    border-radius: 50%; 
+    cursor: pointer; 
+    font-size: 16px; 
 }
-
-.login-header {
-    text-align: center;
-    margin-bottom: 40px;
+.section-title { font-size: 16px; font-weight: bold; margin: 20px 15px 10px 15px; color: #444; }
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 15px; }
+.menu-item { 
+    background: #fff; 
+    padding: 15px 10px; 
+    border-radius: 12px; 
+    text-align: center; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+    cursor: pointer; 
+    transition: transform 0.2s; 
 }
-
-.login-logo {
-    font-size: 4rem;
-    color: #1e3c72;
-    margin-bottom: 15px;
+.menu-item:active { transform: scale(0.95); }
+.icon-wrapper { 
+    width: 45px; 
+    height: 45px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin: 0 auto 8px auto; 
+    font-size: 18px; 
 }
+.menu-item span { font-size: 12px; font-weight: 500; display: block; }
 
-.login-header h2 {
-    font-size: 1.8rem;
-    color: #1e3c72;
-    margin-bottom: 5px;
+/* Warna Icon Unik Halaman */
+.icon-tugas { background: #ffe9ec; color: #de4b60; }
+.icon-bukti { background: #e8f0fe; color: #1a73e8; }
+.icon-isu { background: #fef7e0; color: #b06000; }
+.icon-absen { background: #e6f4ea; color: #137333; }
+.icon-pantau-kerja { background: #fce8e6; color: #c5221f; }
+.icon-pantau-absen { background: #e8f0fe; color: #1a73e8; }
+.icon-staff { background: #feefc3; color: #b06000; }
+.icon-stok { background: #e6f4ea; color: #137333; }
+
+/* Modul Absen Grid Karyawan */
+.grid-absen-karyawan { background-color: #fff; border: 1px solid #ddd; }
+.status-belum-absen { font-weight: bold; color: #1a73e8; font-size: 11px; margin-bottom: 5px; }
+.btn-absen-container { display: flex; gap: 3px; justify-content: center; }
+.btn-masuk { padding: 4px 6px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
+.btn-pulang { padding: 4px 6px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
+#absen-feedback { font-size: 10px; color: #137333; margin: 3px 0 0 0; font-style: italic; }
+
+/* Card Laporan */
+.card-laporan { margin: 15px; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #1a73e8; }
+.card-laporan-title { font-size: 14px; font-weight: bold; }
+.card-laporan-desc { font-size: 12px; color: #777; margin-top: 5px; }
+
+/* 🔑 Halaman Login */
+#login-page { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; background: #f4f6f9; }
+.login-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 360px; text-align: center; }
+.login-box h2 { margin-bottom: 20px; color: #1e3c72; }
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
+.form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+.btn-login { width: 100%; padding: 12px; background: #1e3c72; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+#login-error { color: red; font-size: 14px; margin-top: 10px; font-weight: bold; }
+
+/* 📊 Slide Full Monitor Absensi Admin */
+.slide-full-absensi { 
+    display: none; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    min-height: 100%; 
+    background-color: #f4f6f9; 
+    z-index: 999; 
+    padding: 20px; 
+    box-sizing: border-box; 
 }
-
-.login-header p {
-    font-size: 0.9rem;
-    color: #888;
+.slide-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+    border-bottom: 2px solid #007bff; 
+    padding-bottom: 10px; 
 }
-
-.input-group {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.input-group i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #888;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 15px 15px 15px 45px;
-    border: 1.5px solid #eef0f4;
-    border-radius: 12px;
-    background-color: #f8fafc;
-    font-size: 0.95rem;
-    outline: none;
-    transition: 0.3s;
-}
-
-.input-group input:focus {
-    border-color: #1e3c72;
-    background-color: #fff;
-}
-
-.btn-login {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(30, 60, 114, 0.2);
-}
-
-.error-msg {
-    color: #ff4d4d;
-    font-size: 0.85rem;
-    text-align: center;
-    margin-top: 15px;
-    font-weight: 500;
-}
-
-/* --- Tampilan Dashboard --- */
-.banner {
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: white;
-    padding: 25px 20px;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.banner h2 { font-size: 1.4rem; margin-bottom: 3px; }
-.banner p { font-size: 0.85rem; opacity: 0.8; }
-
-.btn-logout-icon {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-}
-
-.section-title {
-    padding: 20px 20px 10px 20px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #444;
-}
-
-.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px 20px; }
-.menu-item { display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
-
-/* Warna Ikon Menu Karyawan (Biru Muda) */
-.icon-wrapper {
-    width: 65px; height: 65px; background-color: #e8f0fe; border-radius: 15px;
-    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
-}
-.icon-wrapper i { font-size: 1.5rem; color: #1e3c72; }
-
-/* Warna Ikon Menu Admin (Merah Muda) */
-.icon-wrapper.admin-icon {
-    background-color: #ffe8e8;
-}
-.icon-wrapper.admin-icon i {
-    color: #ff4d4d;
-}
-
-.menu-item span { font-size: 0.8rem; font-weight: 500; }
-
-/* --- Tampilan Kartu Tugas --- */
-.job-card {
-    background: #fff; border: 1px solid #eef0f4; border-radius: 12px;
-    margin: 10px 20px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-}
-.admin-border { border-left: 5px solid #ff4d4d !important; }
-.job-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-
-/* Status Badges */
-.status-done { background-color: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-.status-review { background-color: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-
-.job-details p { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
-.job-details i { margin-right: 5px; color: #1e3c72; }
-
-/* Navigasi Bawah */
-.bottom-nav {
-    margin-top: auto;
-    display: flex; justify-content: space-around; background: #fff;
-    padding: 12px 0; border-top: 1px solid #eee;
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; color: #888; font-size: 0.8rem; cursor: pointer; }
-.nav-item.active { color: #1e3c72; }
-.nav-item i { font-size: 1.2rem; margin-bottom: 4px; }
+.slide-header h3 { margin: 0; color: #333; }
+.btn-kembali { padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.tabel-container { background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; }
+.tabel-absen { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.tabel-absen th { background-color: #007bff; color: white; padding: 10px; }
+.tabel-absen td { padding: 10px; border: 1px solid #ddd; }
+.tabel-kosong { text-align: center; color: #888; padding: 20px !important; }
