@@ -13,7 +13,7 @@
 
 <div class="container">
 
-  <!-- ========================================== -->
+    <!-- ========================================== -->
     <!-- 🔑 HALAMAN LOGIN (CLEAN STYLE) -->
     <!-- ========================================== -->
     <div id="login-page">
@@ -63,27 +63,43 @@
         <!-- 👷 SISI PANEL KARYAWAN -->
         <!-- ========================================== -->
         <div id="karyawan-section" style="display: none;">
-            <div class="section-title">Menu Karyawan</div>
+            <div class="section-title">Menu Operasional Karyawan</div>
             <div class="menu-grid">
-                <!-- Fitur 1: Tugas Saya -->
-                <div class="menu-item">
+                <!-- Menu 1: Tugas Hari Ini -->
+                <div class="menu-item" id="menu-karyawan-tugas">
                     <div class="icon-wrapper icon-tugas"><i class="fa-solid fa-list-check"></i></div>
-                    <span>Tugas Saya</span>
+                    <span>1. Tugas Hari Ini</span>
                 </div>
-                <!-- Fitur Tambahan: Kirim Bukti -->
-                <div class="menu-item">
-                    <div class="icon-wrapper icon-bukti"><i class="fa-solid fa-camera"></i></div>
-                    <span>Kirim Bukti</span>
-                </div>
-                <!-- Fitur 2: Lapor Isu -->
-                <div class="menu-item">
+                <!-- Menu 2: Lapor Isu -->
+                <div class="menu-item" id="menu-karyawan-isu">
                     <div class="icon-wrapper icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <span>Lapor Isu</span>
+                    <span>2. Laporan Isu</span>
+                </div>
+                <!-- Menu 3: Status Area -->
+                <div class="menu-item" id="menu-karyawan-status-area">
+                    <div class="icon-wrapper icon-staff"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <span>3. Status Area</span>
+                </div>
+                <!-- Menu 5: SOP Kerja -->
+                <div class="menu-item" id="menu-karyawan-sop">
+                    <div class="icon-wrapper icon-stok"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <span>5. SOP Kebersihan</span>
+                </div>
+                <!-- Menu 6: Edukasi Hama -->
+                <div class="menu-item" id="menu-karyawan-hama">
+                    <div class="icon-wrapper icon-isu"><i class="fa-solid fa-bug"></i></div>
+                    <span>6. Edukasi Hama</span>
+                </div>
+                <!-- Menu 10: Foto Hasil Pekerjaan -->
+                <div class="menu-item" id="menu-karyawan-foto">
+                    <div class="icon-wrapper icon-bukti"><i class="fa-solid fa-camera"></i></div>
+                    <span>10. Foto Hasil Kerja</span>
                 </div>
                 
-                <!-- Fitur 4: Absensi Karyawan -->
-                <div class="menu-item grid-absen-karyawan">
+                <!-- Menu 4: Absensi Karyawan (Tetap Mengunci Otomatis) -->
+                <div class="menu-item grid-absen-karyawan" style="grid-column: span 2;">
                     <div class="icon-wrapper icon-absen"><i class="fa-solid fa-clock"></i></div>
+                    <span style="font-weight: bold; color: #1a73e8;">4. Menu Absen Karyawan</span>
                     <span id="absen-status" class="status-belum-absen">Belum Absen</span>
                     <div class="btn-absen-container">
                         <button id="btn-absen-masuk" class="btn-masuk">Masuk</button>
@@ -92,60 +108,61 @@
                     <p id="absen-feedback"></p>
                 </div>
             </div>
-
-            <div class="section-title">Status Pekerjaan Hari Ini</div>
-            <div class="card-laporan">
-                <div class="card-laporan-title">All Area Operasional</div>
-                <div class="card-laporan-desc">Silakan cek menu "Tugas Saya" untuk memulai pekerjaan harian kamu.</div>
-            </div>
         </div>
 
         <!-- ========================================== -->
         <!-- 👑 SISI PANEL ADMIN -->
         <!-- ========================================== -->
         <div id="admin-section" style="display: none;">
-            <div class="section-title">Panel Utama Admin</div>
+            <div class="section-title">Panel Kontrol Admin Clean Isabel</div>
             <div class="menu-grid">
-                <!-- Menu Admin 1 -->
-                <div class="menu-item">
+                <!-- Monitor Menu 1, 2, 3, 10 -->
+                <div class="menu-item" id="menu-admin-pantau-kerja">
                     <div class="icon-wrapper icon-pantau-kerja"><i class="fa-solid fa-chart-line"></i></div>
-                    <span>Pantau Kerja</span>
+                    <span>1,3. Pantau Kerja & Area</span>
+                </div>
+                <div class="menu-item" id="menu-admin-pantau-isu">
+                    <div class="icon-wrapper icon-isu"><i class="fa-solid fa-bell"></i></div>
+                    <span>2. Pantau Laporan Isu</span>
+                </div>
+                <div class="menu-item" id="menu-admin-pantau-foto">
+                    <div class="icon-wrapper icon-bukti"><i class="fa-solid fa-images"></i></div>
+                    <span>10. Galeri Hasil Kerja</span>
                 </div>
                 
-                <!-- FITUR 4: TOMBOL GRID MONITOR ABSENSI ADMIN -->
+                <!-- Menu 4: Pantau Absensi -->
                 <div class="menu-item" id="menu-pantau-absensi">
                     <div class="icon-wrapper icon-pantau-absen"><i class="fa-solid fa-clipboard-user"></i></div>
-                    <span>Pantau Absensi</span>
+                    <span>4. Pantau Absensi</span>
                 </div>
-                
-                <!-- Menu Admin 3 -->
-                <div class="menu-item">
-                    <div class="icon-wrapper icon-staff"><i class="fa-solid fa-users"></i></div>
-                    <span>Data Staff</span>
+
+                <!-- Menu 7: Management Presentasi Bulanan -->
+                <div class="menu-item" id="menu-admin-presentasi">
+                    <div class="icon-wrapper icon-staff"><i class="fa-solid fa-file-powerpoint"></i></div>
+                    <span>7. File Presentasi</span>
                 </div>
-                <!-- Menu Admin 4 -->
-                <div class="menu-item">
-                    <div class="icon-wrapper icon-stok"><i class="fa-solid fa-bucket"></i></div>
-                    <span>Stok Alat</span>
+                <!-- Menu 8: Program-Program Baru -->
+                <div class="menu-item" id="menu-admin-program">
+                    <div class="icon-wrapper icon-stok"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <span>8. Program" Baru</span>
+                </div>
+                <!-- Menu 9: Pengangkutan Limbah -->
+                <div class="menu-item" id="menu-admin-limbah">
+                    <div class="icon-wrapper icon-isu"><i class="fa-solid fa-truck-field-trash"></i></div>
+                    <span>9. Angkut Limbah</span>
                 </div>
             </div>
 
-            <div class="section-title">Laporan Masuk Dari Karyawan</div>
-            <div class="card-laporan">
-                <div class="card-laporan-title">Ruang Meeting Utama (Oleh: Budi)</div>
-                <div class="card-laporan-desc">📊 Status: Butuh Review</div>
-            </div>
+            <!-- ========================================================= -->
+            <!-- 📄 SLIDE HALAMAN INTERAKTIF (DIBUKA VIA JS NANTI) -->
+            <!-- ========================================================= -->
 
-            <!-- SLIDE KHUSUS MONITOR ABSENSI ADMIN (HALAMAN PENUH TERSEMBUNYI) -->
-            <div id="halaman-detail-absensi" class="slide-full-absensi">
-                
-                <!-- Header Slide -->
+            <!-- SLIDE 4: MONITOR ABSENSI ADMIN (SUDAH AKTIF ✅) -->
+            <div id="halaman-detail-absensi" class="slide-full-absensi" style="display: none;">
                 <div class="slide-header">
                     <h3>📊 Monitor Absensi Karyawan</h3>
                     <button id="btn-tutup-absensi" class="btn-kembali">⬅️ Kembali</button>
                 </div>
-                
-                <!-- Tabel Monitoring -->
                 <div class="tabel-container">
                     <table class="tabel-absen">
                         <thead>
@@ -164,6 +181,8 @@
                     </table>
                 </div>
             </div>
+
+            <!-- SLIDE FITUR LAIN AKAN KITA TAMBAHKAN SECARA BERTAHAP DI SINI -->
 
         </div>
 
