@@ -125,12 +125,85 @@ body {
 .tabel-absen td { padding: 10px; border: 1px solid #ddd; }
 .tabel-kosong { text-align: center; color: #888; padding: 20px !important; }
 
-/* Styling Icon Perisai di Halaman Login */
-.login-icon-shield {
-    font-size: 50px;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-    display: inline-block;
+/* 🔑 HALAMAN LOGIN STYLE BARU (PUTIH BERSIH) */
+#login-page { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    padding: 20px; 
+    box-sizing: border-box; 
+    background-color: #ffffff; /* Latar belakang full putih */
+}
+
+.login-wrapper-clean { 
+    width: 100%; 
+    max-width: 380px; 
+    text-align: center; 
+}
+
+.login-shield-clean {
+    font-size: 80px; /* Ukuran perisai besar */
+    color: #1e4587; /* Warna biru gelap sesuai screenshot */
+    margin-bottom: 15px;
+}
+
+.login-wrapper-clean h2 { 
+    margin: 0; 
+    font-size: 32px; 
+    color: #1e4587; 
+    font-weight: bold;
+}
+
+.login-subtitle {
+    margin: 5px 0 35px 0;
+    color: #7a869a;
+    font-size: 15px;
+}
+
+/* Grouping Input & Icon di Dalamnya */
+.input-group-clean {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7a869a;
+    font-size: 16px;
+}
+
+.input-group-clean input { 
+    width: 100%; 
+    padding: 15px 15px 15px 45px; /* Kasih space kiri biar gak tabrakan sama icon */
+    background-color: #f4f6f9; /* Warna abu-abu soft di dalam kolom input */
+    border: 1px solid #e2e8f0; 
+    border-radius: 12px; 
+    box-sizing: border-box; 
+    font-size: 15px;
+    color: #333;
+    outline: none;
+}
+
+/* Tombol Biru Elegan */
+.btn-login-clean { 
+    width: 100%; 
+    padding: 15px; 
+    background: #1e4587; 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    font-size: 16px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    margin-top: 10px; 
+    box-shadow: 0 4px 10px rgba(30, 69, 135, 0.2); /* Efek shadow lembut di bawah tombol */
+    transition: background 0.2s;
+}
+
+.btn-login-clean:active {
+    background: #163569;
 }
