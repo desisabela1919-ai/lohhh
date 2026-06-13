@@ -1,214 +1,217 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// =================================================================
-// ⚠️ DATA CONFIG FIREBASE CONSOLE
-// =================================================================
+// 🛠️ KONFIGURASI FIREBASE KAMU
 const firebaseConfig = {
-  apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
-  authDomain: "clean-isabel-app-eaca6.firebaseapp.com",
-  projectId: "clean-isabel-app-eaca6",
-  storageBucket: "clean-isabel-app-eaca6.firebasestorage.app",
-  messagingSenderId: "929083923327",
-  appId: "1:929083923327:web:3ebff1bbdd42eb3494984a",
-  databaseURL: "https://clean-isabel-app-eaca6-default-rtdb.firebaseio.com/"
+    apiKey: "AIzaSy...", 
+    authDomain: "clean-isabel-app.firebaseapp.com",
+    databaseURL: "https://clean-isabel-app-default-rtdb.firebaseio.com",
+    projectId: "clean-isabel-app",
+    storageBucket: "clean-isabel-app.appspot.com",
+    messagingSenderId: "...",
+    appId: "..."
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const database = getDatabase(app);
+const db = getDatabase(app);
 
-// DAFTAR EMAIL ADMIN
-const listAdminEmail = ["adminisabel@gmail.com", "adriansyah@gmail.com"];
-
-// ELEMEN HTML DOM
+// Elemen DOM Global
 const loginPage = document.getElementById('login-page');
 const dashboardPage = document.getElementById('dashboard-page');
 const loginForm = document.getElementById('login-form');
+const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
 const loginError = document.getElementById('login-error');
-const userDisplayEmail = document.getElementById('user-display-email');
 const roleTitle = document.getElementById('role-title');
+const userDisplayEmail = document.getElementById('user-display-email');
 const btnLogout = document.getElementById('btn-logout');
+
 const karyawanSection = document.getElementById('karyawan-section');
 const adminSection = document.getElementById('admin-section');
 
-// ELEMEN ABSENSI
-const btnAbsenMasuk = document.getElementById('btn-absen-masuk');
-const btnAbsenPulang = document.getElementById('btn-absen-pulang');
-const absenStatus = document.getElementById('absen-status');
-const absenFeedback = document.getElementById('absen-feedback');
-const menuPantauAbsensi = document.getElementById('menu-pantau-absensi');
-const halamanDetailAbsensi = document.getElementById('halaman-detail-absensi');
-const btnTutupAbsensi = document.getElementById('btn-tutup-absensi');
+let currentUserEmail = "";
+let currentUserUID = "";
 
-// FUNGSI TANGGAL & WAKTU (WIB)
-function getTanggalSekarang() {
-    const d = new Date();
-    const tahun = d.getFullYear();
-    const bulan = String(d.getMonth() + 1).padStart(2, '0');
-    const tanggal = String(d.getDate()).padStart(2, '0');
-    return `${tahun}-${bulan}-${tanggal}`; // Hasil pasti: YYYY-MM-DD
-}
+// ==========================================
+// 🔑 PROSES LOGIN & CEK ROLE USER
+// ==========================================
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
+        .then(() => { loginError.textContent = ""; loginForm.reset(); })
+        .catch((err) => { loginError.textContent = "Login Gagal: " + err.message; });
+});
 
-function getWaktuSekarang() {
-    const d = new Date();
-    return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
-}
+btnLogout.addEventListener('click', () => { signOut(auth); });
 
-function formatEmailUntukKey(email) {
-    return email.replace(/\./g, '_').replace(/@/g, '_');
-}
-
-// 1. CEK STATUS AUTHENTICATION REALTIME
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        currentUserEmail = user.email;
+        currentUserUID = user.uid;
+        userDisplayEmail.textContent = currentUserEmail;
         loginPage.style.display = 'none';
         dashboardPage.style.display = 'block';
-        userDisplayEmail.innerText = user.email;
 
-        if (listAdminEmail.includes(user.email.toLowerCase())) {
-            roleTitle.innerText = "Panel Admin 👑";
+        if (currentUserEmail.includes('admin')) {
+            roleTitle.innerHTML = 'Panel Admin <i class="fa-solid fa-crown" style="color: #ffd700;"></i>';
             adminSection.style.display = 'block';
             karyawanSection.style.display = 'none';
-            aktifkanMonitorAbsensiAdmin();
+            aktifkanFiturAdmin();
         } else {
-            roleTitle.innerText = "Panel Karyawan 👷";
+            roleTitle.innerHTML = 'Panel Karyawan <i class="fa-solid fa-user-worker"></i>';
+            karyawanSection.style.style = 'none'; // reset
             karyawanSection.style.display = 'block';
             adminSection.style.display = 'none';
-            cekStatusAbsenKaryawan(user.email);
+            aktifkanFiturKaryawan();
         }
     } else {
-        loginPage.style.display = 'flex';
+        loginPage.style.display = 'block';
         dashboardPage.style.display = 'none';
-        adminSection.style.display = 'none';
-        karyawanSection.style.display = 'none';
     }
 });
 
-// 2. PROSES LOGIN
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    loginError.innerText = "Memverifikasi akun...";
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+// ==========================================
+// 👷 LOGIKA SISI KARYAWAN
+// ==========================================
+function aktifkanFiturKaryawan() {
+    // ⏰ LOGIKA ABSENSI KARYAWAN
+    const btnMasuk = document.getElementById('btn-absen-masuk');
+    const btnPulang = document.getElementById('btn-absen-pulang');
+    const absenStatus = document.getElementById('absen-status');
+    const absenFeedback = document.getElementById('absen-feedback');
+    const todayStr = new Date().toISOString().split('T')[0];
 
-    signInWithEmailAndPassword(auth, email, password)
-        .then(() => { loginError.innerText = ""; })
-        .catch(() => { loginError.innerText = "Akses ditolak! Email atau Password salah."; });
-});
-
-// 3. PROSES LOGOUT
-btnLogout.addEventListener('click', () => {
-    signOut(auth).then(() => { alert("Berhasil keluar dari sistem."); });
-});
-
-// 4. KARYAWAN: CEK STATUS ABSEN HARI INI
-function cekStatusAbsenKaryawan(email) {
-    const tanggal = getTanggalSekarang();
-    const userKey = formatEmailUntukKey(email);
-    const absenRef = ref(database, `absensi/${tanggal}/${userKey}`);
-
-    onValue(absenRef, (snapshot) => {
+    onValue(ref(db, `absensi/${todayStr}/${currentUserUID}`), (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            if (data.jamMasuk && data.jamPulang !== "--") {
-                absenStatus.innerText = `Sudah Pulang (${data.jamPulang})`;
-                absenStatus.style.color = "#dc3545";
-                absenFeedback.innerText = "Absensi hari ini selesai. Selamat beristirahat!";
-                btnAbsenMasuk.disabled = true;
-                btnAbsenPulang.disabled = true;
-            } else if (data.jamMasuk) {
-                absenStatus.innerText = `Sudah Masuk (${data.jamMasuk})`;
-                absenStatus.style.color = "green";
-                absenFeedback.innerText = "Jangan lupa absen pulang nanti setelah selesai kerja!";
-                btnAbsenMasuk.disabled = true;
-                btnAbsenPulang.disabled = false;
+            if (data.masuk && data.pulang) {
+                absenStatus.className = "status-sudah-pulang"; absenStatus.textContent = "Selesai Kerja";
+                btnMasuk.disabled = true; btnPulang.disabled = true;
+            } else if (data.masuk) {
+                absenStatus.className = "status-sudah-masuk"; absenStatus.textContent = "Sudah Masuk (" + data.masuk + ")";
+                btnMasuk.disabled = true; btnPulang.disabled = false;
             }
         } else {
-            absenStatus.innerText = "Belum Absen";
-            absenStatus.style.color = "#1a73e8";
-            absenFeedback.innerText = "";
-            btnAbsenMasuk.disabled = false;
-            btnAbsenPulang.disabled = true;
+            absenStatus.className = "status-belum-absen"; absenStatus.textContent = "Belum Absen";
+            btnMasuk.disabled = false; btnPulang.disabled = true;
         }
     });
-}
 
-// 5. KARYAWAN: TOMBOL ABSEN MASUK & PULANG
-if (btnAbsenMasuk) {
-    btnAbsenMasuk.addEventListener('click', () => {
-        const email = auth.currentUser.email;
-        const namaKaryawan = email.split('@')[0].toUpperCase();
-        const tanggal = getTanggalSekarang();
-        const userKey = formatEmailUntukKey(email);
-        const jamMasuk = getWaktuSekarang();
+    btnMasuk.onclick = () => {
+        const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        set(ref(db, `absensi/${todayStr}/${currentUserUID}`), { nama: currentUserEmail, masuk: jam, status: "Aktif" });
+    };
+    btnPulang.onclick = () => {
+        const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        update(ref(db, `absensi/${todayStr}/${currentUserUID}`), { pulang: jam, status: "Selesai" });
+    };
 
-        set(ref(database, `absensi/${tanggal}/${userKey}`), {
-            nama: namaKaryawan,
-            email: email,
-            jamMasuk: jamMasuk,
-            jamPulang: "--",
-            status: "Hadir"
-        }).then(() => {
-            alert("Absen masuk berhasil disimpan!");
-        });
-    });
-}
+    // 🧹 TOMBOL "STATUS AREA" UNTUK KARYAWAN (POPUP SELESAI AREA)
+    const btnStatusAreaKaryawan = document.getElementById('menu-karyawan-status-area');
+    btnStatusAreaKaryawan.onclick = () => {
+        const namaArea = prompt("Masukkan Nama Area yang selesai dibersihkan:\n(Contoh: Area A, Area B, Lorong Utama, Toilet)");
+        if (!namaArea) return;
 
-if (btnAbsenPulang) {
-    btnAbsenPulang.addEventListener('click', () => {
-        const email = auth.currentUser.email;
-        const tanggal = getTanggalSekarang();
-        const userKey = formatEmailUntukKey(email);
-        const jamPulang = getWaktuSekarang();
+        const sekarang = new Date();
+        const tglJamStr = sekarang.toLocaleDateString('id-ID') + " - " + sekarang.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const cleanAreaID = namaArea.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
 
-        set(ref(database, `absensi/${tanggal}/${userKey}/jamPulang`), jamPulang).then(() => {
-            alert("Absen pulang berhasil disimpan!");
-        });
-    });
-}
+        set(ref(db, `monitoring_area/${todayStr}/${cleanAreaID}`), {
+            area: namaArea,
+            oleh: currentUserEmail,
+            uid: currentUserUID,
+            waktu: tglJamStr,
+            status: "Butuh Pengecekan",
+            catatanAdmin: "-"
+        }).then(() => alert(`Berhasil! ${namaArea} dilaporkan selesai ke Admin.`));
+    };
 
-// 6. ADMIN: MONITOR ABSENSI REAL-TIME
-function aktifkanMonitorAbsensiAdmin() {
-    const tanggal = getTanggalSekarang();
-    const listAbsenRef = ref(database, `absensi/${tanggal}`);
-    const tableBody = document.getElementById('table-absensi-body');
-
-    if (!tableBody) return; // Mencegah eror jika elemen tabel tidak ada
-
-    onValue(listAbsenRef, (snapshot) => {
+    // 🔔 REAL-TIME NOTIFIKASI BALIKAN DARI ADMIN
+    const textNotifKaryawan = document.getElementById('text-notif-karyawan');
+    const boxNotifKaryawan = document.getElementById('notif-area-karyawan');
+    onValue(ref(db, `monitoring_area/${todayStr}`), (snapshot) => {
         const data = snapshot.val();
-        tableBody.innerHTML = ""; 
-
         if (data) {
-            Object.keys(data).forEach((key) => {
-                const absen = data[key];
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${absen.nama}</strong><br><span style="font-size:11px; color:#666;">${absen.email}</span></td>
-                    <td style="color: green; font-weight: bold;">${absen.jamMasuk}</td>
-                    <td style="color: #dc3545; font-weight: bold;">${absen.jamPulang}</td>
-                    <td><span style="background-color: #e6f4ea; color: #137333; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${absen.status}</span></td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        } else {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #888; padding: 20px;">Belum ada data absensi hari ini.</td>
-                </tr>
-            `;
+            let infoTeks = "<strong>Update Status Area Hari Ini:</strong><br>";
+            for (let id in data) {
+                if (data[id].uid === currentUserUID) {
+                    let warnaStatus = "text-warning-clean";
+                    if (data[id].status === "Area Bersih") warnaStatus = "text-success-clean";
+                    if (data[id].status === "Masih Kotor" || data[id].status === "Kurang Bersih") warnaStatus = "text-danger-clean";
+
+                    infoTeks += `📍 <b>${data[id].area}</b>: <span class="${warnaStatus}">${data[id].status}</span><br>`;
+                }
+            }
+            textNotifKaryawan.innerHTML = infoTeks;
         }
     });
 }
 
-// 7. BUKA TUTUP SLIDE MONITOR ABSENSI ADMIN
-if (menuPantauAbsensi && halamanDetailAbsensi && btnTutupAbsensi) {
-    menuPantauAbsensi.addEventListener('click', () => {
-        halamanDetailAbsensi.style.display = 'block';
+// ==========================================
+// 👑 LOGIKA SISI ADMIN
+// ==========================================
+function aktifkanFiturAdmin() {
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Slide 4: Buka/Tutup Monitor Absensi Admin
+    document.getElementById('menu-pantau-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'block';
+    document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'none';
+
+    onValue(ref(db, `absensi/${todayStr}`), (snapshot) => {
+        const data = snapshot.val();
+        const tbody = document.getElementById('table-absensi-body');
+        tbody.innerHTML = "";
+        if (data) {
+            for (let uid in data) {
+                tbody.innerHTML += `<tr>
+                    <td>${data[uid].nama}</td>
+                    <td>${data[uid].masuk || '-'}</td>
+                    <td>${data[uid].pulang || '-'}</td>
+                    <td><span class="badge-aktif">${data[uid].status}</span></td>
+                </tr>`;
+            }
+        } else {
+            tbody.innerHTML = `<tr><td colspan="4" class="tabel-kosong">Belum ada data absensi hari ini.</td></tr>`;
+        }
     });
-    btnTutupAbsensi.addEventListener('click', () => {
-        halamanDetailAbsensi.style.display = 'none';
+
+    // 🧹 SLIDE 3: MONITOR & EVALUASI KERJA AREA ADMIN
+    document.getElementById('menu-admin-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'block';
+    document.getElementById('btn-tutup-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'none';
+
+    onValue(ref(db, `monitoring_area/${todayStr}`), (snapshot) => {
+        const data = snapshot.val();
+        const tbody = document.getElementById('table-pantau-area-body');
+        tbody.innerHTML = "";
+        
+        if (data) {
+            for (let areaID in data) {
+                let statusClass = "text-warning-clean";
+                if (data[areaID].status === "Area Bersih") statusClass = "text-success-clean";
+                if (data[areaID].status === "Kurang Bersih" || data[areaID].status === "Masih Kotor") statusClass = "text-danger-clean";
+
+                tbody.innerHTML += `<tr>
+                    <td><small>${data[areaID].waktu}<br>By: ${data[areaID].oleh}</small></td>
+                    <td><b>${data[areaID].area}</b></td>
+                    <td><span class="${statusClass}">${data[areaID].status}</span></td>
+                    <td>
+                        <button class="btn-evaluasi btn-eval-bersih" onclick="evaluasiArea('${areaID}', 'Area Bersih')">Bersih ✅</button>
+                        <button class="btn-evaluasi btn-eval-kurang" onclick="evaluasiArea('${areaID}', 'Kurang Bersih')">Kurang ⚠️</button>
+                        <button class="btn-evaluasi btn-eval-kotor" onclick="evaluasiArea('${areaID}', 'Masih Kotor')">Kotor ❌</button>
+                    </td>
+                </tr>`;
+            }
+        } else {
+            tbody.innerHTML = `<tr><td colspan="4" class="tabel-kosong">Belum ada laporan penyelesaian area hari ini.</td></tr>`;
+        }
     });
 }
+
+// Fungsi global agar bisa dipanggil langsung dari onclick HTML dinamis tabel admin
+window.evaluasiArea = function(areaID, statusBaru) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    update(ref(db, `monitoring_area/${todayStr}/${areaID}`), { status: statusBaru })
+        .then(() => alert(`Evaluasi disimpan: ${statusBaru}`));
+};
