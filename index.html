@@ -4,155 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clean Isabel App</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- FontAwesome untuk Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Menghubungkan ke File CSS Terpisah -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="phone-container">
-        
-        <div id="login-page" class="auth-container">
-            <div class="login-header">
-                <i class="fa-solid fa-shield-halved login-logo"></i>
-                <h2>Clean Isabel</h2>
-                <p>Silakan login sesuai akun Anda</p>
-            </div>
-            
+<div class="container">
+
+    <!-- ========================================== -->
+    <!-- 🔑 HALAMAN LOGIN -->
+    <!-- ========================================== -->
+    <div id="login-page">
+        <div class="login-box">
+            <h2>Clean Isabel</h2>
             <form id="login-form">
-                <div class="input-group">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" id="login-email" placeholder="Email Pengguna" required>
+                <div class="form-group">
+                    <label for="login-email">Email Akun</label>
+                    <input type="email" id="login-email" placeholder="contoh@gmail.com" required>
                 </div>
-                <div class="input-group">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="login-password" placeholder="Password" required>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="******" required>
                 </div>
                 <button type="submit" class="btn-login">Masuk Sistem</button>
             </form>
-            <p id="login-error" class="error-msg"></p>
+            <p id="login-error"></p>
         </div>
-
-        <div id="dashboard-page" class="main-dashboard" style="display: none;">
-            
-            <div class="banner">
-                <div class="banner-user">
-                    <h2 id="role-title">Memuat Role...</h2>
-                    <p id="user-display-email">Memuat akun...</p>
-                </div>
-                <button id="btn-logout" class="btn-logout-icon" title="Keluar">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
-            </div>
-
-            <div id="karyawan-section" style="display: none;">
-                <div class="section-title">Menu Karyawan</div>
-                <div class="menu-grid">
-                    <div class="menu-item">
-                        <div class="icon-wrapper"><i class="fa-solid fa-list-check"></i></div>
-                        <span>Tugas Saya</span>
-                    </div>
-                    <div class="menu-item">
-                        <div class="icon-wrapper"><i class="fa-solid fa-camera"></i></div>
-                        <span>Kirim Bukti</span>
-                    </div>
-                    <div class="menu-item">
-                        <div class="icon-wrapper"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                        <span>Lapor Isu</span>
-                        <!-- KOTAK FITUR ABSENSI KARYAWAN -->
-    <div id="absensi-box" style="margin: 15px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
-        <h4 style="margin-top: 0;">⏱️ Absensi Harian Karyawan</h4>
-        <p id="absen-status" style="font-weight: bold; color: blue; margin-bottom: 10px;">Status: Belum Absen Hari Ini</p>
-        <div style="display: flex; gap: 10px;">
-            <button id="btn-absen-masuk" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Absen Masuk 📥</button>
-            <button id="btn-absen-pulang" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;" disabled>Absen Pulang 📤</button>
-        </div>
-        <p id="absen-feedback" style="margin-top: 8px; color: green; font-size: 13px; font-style: italic;"></p>
     </div>
-                    </div>
-                </div>
 
-                <div class="section-title">Status Pekerjaan Hari Ini</div>
-                <div class="job-card">
-                    <div class="job-header">
-                        <strong>Lobby & Resepsionis</strong>
-                        <span class="status-done">Selesai</span>
+    <!-- ========================================== -->
+    <!-- 🖥️ HALAMAN UTAMA DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="dashboard-page" style="display: none;">
+        
+        <!-- Banner Atas & Tombol Logout -->
+        <div class="banner-user">
+            <h2 id="role-title">Memuat Role...</h2>
+            <p id="user-display-email">Memuat akun...</p>
+            <button id="btn-logout" class="btn-logout-icon" title="Keluar">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 👷 SISI PANEL KARYAWAN -->
+        <!-- ========================================== -->
+        <div id="karyawan-section" style="display: none;">
+            <div class="section-title">Menu Karyawan</div>
+            <div class="menu-grid">
+                <!-- Fitur 1: Tugas Saya -->
+                <div class="menu-item">
+                    <div class="icon-wrapper icon-tugas"><i class="fa-solid fa-list-check"></i></div>
+                    <span>Tugas Saya</span>
+                </div>
+                <!-- Fitur Tambahan: Kirim Bukti -->
+                <div class="menu-item">
+                    <div class="icon-wrapper icon-bukti"><i class="fa-solid fa-camera"></i></div>
+                    <span>Kirim Bukti</span>
+                </div>
+                <!-- Fitur 2: Lapor Isu -->
+                <div class="menu-item">
+                    <div class="icon-wrapper icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <span>Lapor Isu</span>
+                </div>
+                
+                <!-- Fitur 4: Absensi Karyawan -->
+                <div class="menu-item grid-absen-karyawan">
+                    <div class="icon-wrapper icon-absen"><i class="fa-solid fa-clock"></i></div>
+                    <span id="absen-status" class="status-belum-absen">Belum Absen</span>
+                    <div class="btn-absen-container">
+                        <button id="btn-absen-masuk" class="btn-masuk">Masuk</button>
+                        <button id="btn-absen-pulang" class="btn-pulang" disabled>Pulang</button>
                     </div>
-                    <div class="job-details">
-                        <p><i class="fa-regular fa-clock"></i> Jam Kerja: 08:00 - selesai</p>
-                        <p><i class="fa-solid fa-circle-info"></i> Status: Sudah di-review Admin</p>
-                    </div>
+                    <p id="absen-feedback"></p>
                 </div>
             </div>
 
-            <div id="admin-section" style="display: none;">
-                <div class="section-title">Panel Utama Admin</div>
-                <div class="menu-grid">
-                    <div class="menu-item">
-                        <div class="icon-wrapper admin-icon"><i class="fa-solid fa-chart-line"></i></div>
-                        <span>Pantau Kerja</span>
-                    </div>
-                    <!-- TOMBOL GRID ABSENSI ADMIN -->
-<div class="menu-item" id="menu-pantau-absensi" style="cursor: pointer;">
-    <div class="icon-wrapper" style="background-color: #007bff; color: white;">
-        <i class="fa-solid fa-clipboard-user"></i>
+            <div class="section-title">Status Pekerjaan Hari Ini</div>
+            <div class="card-laporan">
+                <div class="card-laporan-title">All Area Operasional</div>
+                <div class="card-laporan-desc">Silakan cek menu "Tugas Saya" untuk memulai pekerjaan harian kamu.</div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 👑 SISI PANEL ADMIN -->
+        <!-- ========================================== -->
+        <div id="admin-section" style="display: none;">
+            <div class="section-title">Panel Utama Admin</div>
+            <div class="menu-grid">
+                <!-- Menu Admin 1 -->
+                <div class="menu-item">
+                    <div class="icon-wrapper icon-pantau-kerja"><i class="fa-solid fa-chart-line"></i></div>
+                    <span>Pantau Kerja</span>
+                </div>
+                
+                <!-- FITUR 4: TOMBOL GRID MONITOR ABSENSI ADMIN -->
+                <div class="menu-item" id="menu-pantau-absensi">
+                    <div class="icon-wrapper icon-pantau-absen"><i class="fa-solid fa-clipboard-user"></i></div>
+                    <span>Pantau Absensi</span>
+                </div>
+                
+                <!-- Menu Admin 3 -->
+                <div class="menu-item">
+                    <div class="icon-wrapper icon-staff"><i class="fa-solid fa-users"></i></div>
+                    <span>Data Staff</span>
+                </div>
+                <!-- Menu Admin 4 -->
+                <div class="menu-item">
+                    <div class="icon-wrapper icon-stok"><i class="fa-solid fa-bucket"></i></div>
+                    <span>Stok Alat</span>
+                </div>
+            </div>
+
+            <div class="section-title">Laporan Masuk Dari Karyawan</div>
+            <div class="card-laporan">
+                <div class="card-laporan-title">Ruang Meeting Utama (Oleh: Budi)</div>
+                <div class="card-laporan-desc">📊 Status: Butuh Review</div>
+            </div>
+
+            <!-- SLIDE KHUSUS MONITOR ABSENSI ADMIN (HALAMAN PENUH TERSEMBUNYI) -->
+            <div id="halaman-detail-absensi" class="slide-full-absensi">
+                
+                <!-- Header Slide -->
+                <div class="slide-header">
+                    <h3>📊 Monitor Absensi Karyawan</h3>
+                    <button id="btn-tutup-absensi" class="btn-kembali">⬅️ Kembali</button>
+                </div>
+                
+                <!-- Tabel Monitoring -->
+                <div class="tabel-container">
+                    <table class="tabel-absen">
+                        <thead>
+                            <tr>
+                                <th>Nama Karyawan</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Pulang</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-absensi-body">
+                            <tr>
+                                <td colspan="4" class="tabel-kosong">Belum ada data absensi hari ini.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-    <span>Pantau Absensi</span>
 </div>
-                    <!-- HALAMAN DETAIL TABEL ABSENSI -->
-<div id="halaman-detail-absensi" style="display: none; margin-top: 20px; padding: 15px; border: 1px solid #007bff; border-radius: 8px; background-color: #f0f7ff;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3 style="margin: 0;">📊 Monitor Absensi Karyawan</h3>
-        <button id="btn-tutup-absensi" style="padding: 5px 10px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Tutup ❌</button>
-    </div>
-    
-    <table border="1" cellpadding="8" style="width: 100%; border-collapse: collapse; background-color: white;">
-        <thead>
-            <tr style="background-color: #007bff; color: white;">
-                <th>Nama Karyawan</th>
-                <th>Jam Masuk</th>
-                <th>Jam Pulang</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="table-absensi-body">
-            <tr>
-                <td colspan="4" style="text-align: center; color: #888;">Belum ada data absensi hari ini.</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-                    <div class="menu-item">
-                        <div class="icon-wrapper admin-icon"><i class="fa-solid fa-users"></i></div>
-                        <span>Data Staff</span>
-                    </div>
-                    <div class="menu-item">
-                        <div class="icon-wrapper admin-icon"><i class="fa-solid fa-bucket"></i></div>
-                        <span>Stok Alat</span>
-                    </div>
-                </div>
 
-                <div class="section-title">Laporan Masuk Dari Karyawan</div>
-                <div class="job-card admin-border">
-                    <div class="job-header">
-                        <strong>Ruang Meeting Utama (Oleh: Budi)</strong>
-                        <span class="status-review">Butuh Review</span>
-                    </div>
-                    <div class="job-details">
-                        <p><i class="fa-regular fa-clock"></i> Masuk pada: 10:30 WIB</p>
-                        <p><i class="fa-regular fa-image"></i> Lampiran: Foto_Ruangan_Bersih.jpg</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bottom-nav">
-                <div class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></div>
-                <div class="nav-item"><i class="fa-solid fa-clipboard-list"></i><span>Aktivitas</span></div>
-                <div class="nav-item"><i class="fa-solid fa-user"></i><span>Akun</span></div>
-            </div>
-
-        </div>
-    </div>
-
-    <script type="module" src="app.js"></script>
+<!-- Script Utama Aplikasi -->
+<script type="module" src="app.js"></script>
 </body>
 </html>
