@@ -124,3 +124,13 @@ body {
 .tabel-absen th { background-color: #007bff; color: white; padding: 10px; }
 .tabel-absen td { padding: 10px; border: 1px solid #ddd; }
 .tabel-kosong { text-align: center; color: #888; padding: 20px !important; }
+
+/* Styling Icon Perisai di Halaman Login */
+.login-icon-shield {
+    font-size: 50px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    display: inline-block;
+}
