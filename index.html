@@ -56,64 +56,74 @@
             </button>
         </div>
 
-        <!-- ========================================== -->
-        <!-- 👷 SISI PANEL KARYAWAN -->
-        <!-- ========================================== -->
-        <div id="karyawan-section" style="display: none;">
-            <div class="section-title">Menu Operasional Karyawan</div>
-            <div class="menu-grid-compact">
-                <div class="menu-item-compact" id="menu-karyawan-tugas">
-                    <div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div>
-                    <span>Tugas Hari Ini</span>
-                </div>
-                <div class="menu-item-compact" id="menu-karyawan-isu">
-                    <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <span>Laporan Isu</span>
-                </div>
-                <!-- Menu Status Area Karyawan -->
-                <div class="menu-item-compact" id="menu-karyawan-status-area">
-                    <div class="icon-wrapper-compact icon-staff"><i class="fa-solid fa-map-location-dot"></i></div>
-                    <span>Status Area</span>
-                </div>
-                <div class="menu-item-compact" id="menu-karyawan-sop">
-                    <div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-book-bookmark"></i></div>
-                    <span>SOP Kebersihan</span>
-                </div>
-                <div class="menu-item-compact" id="menu-karyawan-hama">
-                    <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-bug"></i></div>
-                    <span>Edukasi Hama</span>
-                </div>
-                <div class="menu-item-compact" id="menu-karyawan-foto">
-                    <div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div>
-                    <span>Foto Hasil Kerja</span>
-                </div>
-                
-                 
-                <div class="grid-container-baru" style="margin-top: 25px; width: 100%;">
-       <h3 style="color: #333; margin-bottom: 15px;"><i class="fa-solid fa-layer-group"></i> Monitoring Area Hari Ini</h3>
-       <div id="grid-area-karyawan">
-           </div>
-                </div>
-            </div>
-                <!-- Menu Absen Karyawan -->
-                <div class="menu-item-compact grid-absen-full">
-                    <div class="icon-wrapper-compact icon-absen"><i class="fa-solid fa-clock"></i></div>
-                    <span class="absen-title-text">Menu Absen Karyawan</span>
-                    <span id="absen-status" class="status-belum-absen">Belum Absen</span>
-                    <div class="btn-absen-container">
-                        <button id="btn-absen-masuk" class="btn-masuk">Masuk</button>
-                        <button id="btn-absen-pulang" class="btn-pulang" disabled>Pulang</button>
-                    </div>
-                    <p id="absen-feedback"></p>
-                </div>
-            </div>
-
-            <!-- Box Notifikasi/Feedback dari Admin secara Real-Time -->
-            <div class="section-title" style="margin-top: 15px;">🔔 Notifikasi Kebersihan Area</div>
-            <div id="notif-area-karyawan" class="card-laporan" style="background-color: #fff; border-left: 5px solid #ccc;">
-                <div class="card-laporan-desc" id="text-notif-karyawan">Belum ada pembaruan status area dari Admin hari ini.</div>
-            </div>
+       <!-- ========================================== -->
+<!-- 👷 SISI PANEL KARYAWAN -->
+<!-- ========================================== -->
+<div id="karyawan-section" style="display: none;">
+    <div class="section-title">Menu Operasional Karyawan</div>
+    
+    <!-- 1. Kelompok Menu Utama Karyawan (Tetap Rapi di Atas) -->
+    <div class="menu-grid-compact">
+        <div class="menu-item-compact" id="menu-karyawan-tugas">
+            <div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div>
+            <span>Tugas Hari Ini</span>
         </div>
+        
+        <div class="menu-item-compact" id="menu-karyawan-isu">
+            <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <span>Laporan Isu</span>
+        </div>
+        
+        <div class="menu-item-compact" id="menu-karyawan-status-area">
+            <div class="icon-wrapper-compact icon-staff"><i class="fa-solid fa-network-wired"></i></div>
+            <span>Status Area</span>
+        </div>
+        
+        <div class="menu-item-compact" id="menu-karyawan-sop">
+            <div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-book-bookmark"></i></div>
+            <span>SOP Kebersihan</span>
+        </div>
+        
+        <div class="menu-item-compact" id="menu-karyawan-hama">
+            <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-bug"></i></div>
+            <span>Edukasi Hama</span>
+        </div>
+        
+        <div class="menu-item-compact" id="menu-karyawan-foto">
+            <div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div>
+            <span>Foto Hasil Kerja</span>
+        </div>
+    </div> <!-- Batas Penutup Menu Ringkas Atas -->
+
+    <!-- 2. Menu Absen Karyawan (Berdiri Sendiri) -->
+    <!-- Menu Absen Karyawan -->
+    <div class="menu-item-compact grid-absen-full" style="margin-top: 20px;">
+        <div class="icon-wrapper-compact icon-absen"><i class="fa-solid fa-clock"></i></div>
+        <span class="absen-title-text">Menu Absen Karyawan</span>
+        <span id="absen-status" class="status-belum-absen">Belum Absen</span>
+        <div class="btn-absen-container">
+            <button id="btn-absen-masuk" class="btn-masuk">Masuk</button>
+            <button id="btn-absen-pulang" class="btn-pulang" disabled>Pulang</button>
+        </div>
+    </div>
+
+    <!-- 3. KOTAK MONITORING AREA BARU (Keluar dari Grid, Melebar Rapi ke Samping) -->
+    <div class="grid-container-baru" style="margin-top: 25px; width: 100%; display: block; clear: both;">
+        <h3 style="color: #333; margin-bottom: 15px; font-size: 18px; font-weight: bold;"><i class="fa-solid fa-layer-group"></i> Monitoring Area Hari Ini</h3>
+        <div id="grid-area-karyawan">
+            <!-- Kotak-kotak area otomatis dibentuk horizontal di sini oleh app.js -->
+        </div>
+    </div>
+
+    <!-- 4. Notifikasi Kebersihan Area Bawaan Kamu -->
+    <div id="area-feedback" style="margin-top: 25px;">
+        <h4 style="margin-bottom: 10px;"><i class="fa-solid fa-bell"></i> Notifikasi Kebersihan Area</h4>
+        <div class="feedback-box" style="background: #e9ecef; padding: 12px; border-radius: 6px; font-size: 14px; color: #555;">
+            Belum ada pembaruan status area dari Admin hari ini.
+        </div>
+    </div>
+
+</div>
 
         <!-- ========================================== -->
         <!-- 👑 SISI PANEL ADMIN -->
