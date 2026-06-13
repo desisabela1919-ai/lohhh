@@ -23,6 +23,14 @@ const listAdminEmail = [
     "adminisabel@gmail.com",
     "adriansyah@gmail.com"
 ];
+// =================================================================
+// 📋 DAFTAR EMAIL YANG BERSTATUS SEBAGAI KARYAWAN
+// =================================================================
+const listKaryawanEmail = [
+    "zidanisabela@gmail.com",
+    "lintangisabela@gmail.com"
+    "tomiisabela@gmail.com"
+];
 
 // Menghubungkan elemen HTML ke JavaScript
 const loginPage = document.getElementById('login-page');
