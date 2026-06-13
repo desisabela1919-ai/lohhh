@@ -94,3 +94,22 @@ btnLogout.addEventListener('click', () => {
         alert("Berhasil keluar dari sistem.");
     });
 });
+
+// =================================================================
+// 🖱️ LOGIKA BUKA/TUTUP GRID ABSENSI ADMIN
+// =================================================================
+const menuPantauAbsensi = document.getElementById('menu-pantau-absensi');
+const halamanDetailAbsensi = document.getElementById('halaman-detail-absensi');
+const btnTutupAbsensi = document.getElementById('btn-tutup-absensi');
+
+if (menuPantauAbsensi && halamanDetailAbsensi && btnTutupAbsensi) {
+    // Kalau tombol Grid diklik -> Munculkan Tabel
+    menuPantauAbsensi.addEventListener('click', () => {
+        halamanDetailAbsensi.style.display = 'block';
+    });
+
+    // Kalau tombol Tutup diklik -> Sembunyikan Tabel
+    btnTutupAbsensi.addEventListener('click', () => {
+        halamanDetailAbsensi.style.display = 'none';
+    });
+}
