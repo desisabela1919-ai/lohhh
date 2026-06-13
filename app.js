@@ -12,7 +12,7 @@ const firebaseConfig = {
   storageBucket: "clean-isabel-app-eaca6.firebasestorage.app",
   messagingSenderId: "929083923327",
   appId: "1:929083923327:web:3ebff1bbdd42eb3494984a",
-  databaseURL: "https://clean-isabel-app-eaca6-default-rtdb.firebaseio.com/" // Database URL untuk simpan absen
+  databaseURL: "https://clean-isabel-app-eaca6-default-rtdb.firebaseio.com/"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -41,12 +41,14 @@ const absenFeedback = document.getElementById('absen-feedback');
 const menuPantauAbsensi = document.getElementById('menu-pantau-absensi');
 const halamanDetailAbsensi = document.getElementById('halaman-detail-absensi');
 const btnTutupAbsensi = document.getElementById('btn-tutup-absensi');
-const tableAbsensiBody = document.getElementById('table-absensi-body');
 
-// FUNGSI UNTUK MENDAPATKAN TANGGAL & WAKTU (WIB)
+// FUNGSI TANGGAL & WAKTU (WIB)
 function getTanggalSekarang() {
     const d = new Date();
-    return d.toISOString().split('T')[0]; // Hasil: YYYY-MM-DD (Contoh: 2026-06-13)
+    const tahun = d.getFullYear();
+    const bulan = String(d.getMonth() + 1).padStart(2, '0');
+    const tanggal = String(d.getDate()).padStart(2, '0');
+    return `${tahun}-${bulan}-${tanggal}`; // Hasil pasti: YYYY-MM-DD
 }
 
 function getWaktuSekarang() {
@@ -54,7 +56,6 @@ function getWaktuSekarang() {
     return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
 }
 
-// FORMAT EMAIL UTK KEY DATABASE (Menghilangkan karakter titik/invalid)
 function formatEmailUntukKey(email) {
     return email.replace(/\./g, '_').replace(/@/g, '_');
 }
@@ -70,15 +71,11 @@ onAuthStateChanged(auth, (user) => {
             roleTitle.innerText = "Panel Admin 👑";
             adminSection.style.display = 'block';
             karyawanSection.style.display = 'none';
-            
-            // ADMIN: Pantau data absensi secara real-time
             aktifkanMonitorAbsensiAdmin();
         } else {
             roleTitle.innerText = "Panel Karyawan 👷";
             karyawanSection.style.display = 'block';
             adminSection.style.display = 'none';
-            
-            // KARYAWAN: Cek status tombol absen mereka hari ini
             cekStatusAbsenKaryawan(user.email);
         }
     } else {
@@ -106,7 +103,7 @@ btnLogout.addEventListener('click', () => {
     signOut(auth).then(() => { alert("Berhasil keluar dari sistem."); });
 });
 
-// 4. KARYAWAN: CEK STATUS ABSEN HARI INI (Agar tombol tidak ke-reset saat aplikasi ditutup)
+// 4. KARYAWAN: CEK STATUS ABSEN HARI INI
 function cekStatusAbsenKaryawan(email) {
     const tanggal = getTanggalSekarang();
     const userKey = formatEmailUntukKey(email);
@@ -138,16 +135,15 @@ function cekStatusAbsenKaryawan(email) {
     });
 }
 
-// 5. KARYAWAN: AKSI TEKAN TOMBOL ABSEN MASUK & PULANG
+// 5. KARYAWAN: TOMBOL ABSEN MASUK & PULANG
 if (btnAbsenMasuk) {
     btnAbsenMasuk.addEventListener('click', () => {
         const email = auth.currentUser.email;
-        const namaKaryawan = email.split('@')[0].toUpperCase(); // Mengambil nama depan email sebagai nama pajangan
+        const namaKaryawan = email.split('@')[0].toUpperCase();
         const tanggal = getTanggalSekarang();
         const userKey = formatEmailUntukKey(email);
         const jamMasuk = getWaktuSekarang();
 
-        // Simpan data absen masuk ke Firebase Realtime Database
         set(ref(database, `absensi/${tanggal}/${userKey}`), {
             nama: namaKaryawan,
             email: email,
@@ -167,25 +163,25 @@ if (btnAbsenPulang) {
         const userKey = formatEmailUntukKey(email);
         const jamPulang = getWaktuSekarang();
 
-        // Ambil data jam masuk sebelumnya, lalu update jam pulang di Firebase
-        const dataRef = ref(database, `absensi/${tanggal}/${userKey}/jamPulang`);
-        set(dataRef, jamPulang).then(() => {
+        set(ref(database, `absensi/${tanggal}/${userKey}/jamPulang`), jamPulang).then(() => {
             alert("Absen pulang berhasil disimpan!");
         });
     });
 }
 
-// 6. ADMIN: MONITOR DATA ABSENSI KARYAWAN SECARA REAL-TIME
+// 6. ADMIN: MONITOR ABSENSI REAL-TIME
 function aktifkanMonitorAbsensiAdmin() {
     const tanggal = getTanggalSekarang();
     const listAbsenRef = ref(database, `absensi/${tanggal}`);
+    const tableBody = document.getElementById('table-absensi-body');
+
+    if (!tableBody) return; // Mencegah eror jika elemen tabel tidak ada
 
     onValue(listAbsenRef, (snapshot) => {
         const data = snapshot.val();
-        tableAbsensiBody.innerHTML = ""; // Bersihkan tabel lama
+        tableBody.innerHTML = ""; 
 
         if (data) {
-            // Looping mengambil data setiap karyawan yang sudah absen hari ini
             Object.keys(data).forEach((key) => {
                 const absen = data[key];
                 const tr = document.createElement('tr');
@@ -195,12 +191,12 @@ function aktifkanMonitorAbsensiAdmin() {
                     <td style="color: #dc3545; font-weight: bold;">${absen.jamPulang}</td>
                     <td><span style="background-color: #e6f4ea; color: #137333; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${absen.status}</span></td>
                 `;
-                tableAbsensiBody.appendChild(tr);
+                tableBody.appendChild(tr);
             });
         } else {
-            tableAbsensiBody.innerHTML = `
+            tableBody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="tabel-kosong">Belum ada data absensi hari ini.</td>
+                    <td colspan="4" style="text-align: center; color: #888; padding: 20px;">Belum ada data absensi hari ini.</td>
                 </tr>
             `;
         }
