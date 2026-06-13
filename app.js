@@ -4,13 +4,13 @@ import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/
 
 // 🛠️ KONFIGURASI FIREBASE ASLI CLEAN ISABEL
 const firebaseConfig = {
-    apiKey: "AIzaSyD7X8p3N1v9Q6zR4wB2mK5sL8tX0yZ1uVw", 
-    authDomain: "clean-isabel-app.firebaseapp.com",
-    databaseURL: "https://clean-isabel-app-default-rtdb.firebaseio.com",
-    projectId: "clean-isabel-app",
-    storageBucket: "clean-isabel-app.appspot.com",
-    messagingSenderId: "583920194857",
-    appId: "1:583920194857:web:c83d92e10a4b7c3d2e1f0b"
+  apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
+  authDomain: "clean-isabel-app-eaca6.firebaseapp.com",
+  databaseURL: "https://clean-isabel-app-eaca6-default-rtdb.firebaseio.com",
+  projectId: "clean-isabel-app-eaca6",
+  storageBucket: "clean-isabel-app-eaca6.firebasestorage.app",
+  messagingSenderId: "929083923327",
+  appId: "1:929083923327:web:3ebff1bbdd42eb3494984a"
 };
 
 const app = initializeApp(firebaseConfig);
