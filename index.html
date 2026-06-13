@@ -46,16 +46,6 @@
 
             <div id="karyawan-section" style="display: none;">
                 <div class="section-title">Menu Karyawan</div>
-                <!-- KOTAK FITUR ABSENSI KARYAWAN -->
-    <div id="absensi-box" style="margin: 15px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
-        <h4 style="margin-top: 0;">⏱️ Absensi Harian Karyawan</h4>
-        <p id="absen-status" style="font-weight: bold; color: blue; margin-bottom: 10px;">Status: Belum Absen Hari Ini</p>
-        <div style="display: flex; gap: 10px;">
-            <button id="btn-absen-masuk" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Absen Masuk 📥</button>
-            <button id="btn-absen-pulang" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;" disabled>Absen Pulang 📤</button>
-        </div>
-        <p id="absen-feedback" style="margin-top: 8px; color: green; font-size: 13px; font-style: italic;"></p>
-    </div>
                 <div class="menu-grid">
                     <div class="menu-item">
                         <div class="icon-wrapper"><i class="fa-solid fa-list-check"></i></div>
@@ -68,6 +58,16 @@
                     <div class="menu-item">
                         <div class="icon-wrapper"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <span>Lapor Isu</span>
+                        <!-- KOTAK FITUR ABSENSI KARYAWAN -->
+    <div id="absensi-box" style="margin: 15px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+        <h4 style="margin-top: 0;">⏱️ Absensi Harian Karyawan</h4>
+        <p id="absen-status" style="font-weight: bold; color: blue; margin-bottom: 10px;">Status: Belum Absen Hari Ini</p>
+        <div style="display: flex; gap: 10px;">
+            <button id="btn-absen-masuk" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Absen Masuk 📥</button>
+            <button id="btn-absen-pulang" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;" disabled>Absen Pulang 📤</button>
+        </div>
+        <p id="absen-feedback" style="margin-top: 8px; color: green; font-size: 13px; font-style: italic;"></p>
+    </div>
                     </div>
                 </div>
 
@@ -85,9 +85,26 @@
             </div>
 
             <div id="admin-section" style="display: none;">
-                <!-- KOTAK PANTAUAN ABSENSI UNTUK ADMIN -->
-<div id="admin-absensi-box" style="margin-top: 20px; padding: 15px; border: 1px solid #007bff; border-radius: 8px; background-color: #f0f7ff;">
-    <h3>📊 Monitor Absensi Karyawan</h3>
+                <div class="section-title">Panel Utama Admin</div>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="icon-wrapper admin-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <span>Pantau Kerja</span>
+                    </div>
+                    <!-- TOMBOL GRID ABSENSI ADMIN -->
+<div class="menu-item" id="menu-pantau-absensi" style="cursor: pointer;">
+    <div class="icon-wrapper" style="background-color: #007bff; color: white;">
+        <i class="fa-solid fa-clipboard-user"></i>
+    </div>
+    <span>Pantau Absensi</span>
+</div>
+                    <!-- HALAMAN DETAIL TABEL ABSENSI -->
+<div id="halaman-detail-absensi" style="display: none; margin-top: 20px; padding: 15px; border: 1px solid #007bff; border-radius: 8px; background-color: #f0f7ff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="margin: 0;">📊 Monitor Absensi Karyawan</h3>
+        <button id="btn-tutup-absensi" style="padding: 5px 10px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Tutup ❌</button>
+    </div>
+    
     <table border="1" cellpadding="8" style="width: 100%; border-collapse: collapse; background-color: white;">
         <thead>
             <tr style="background-color: #007bff; color: white;">
@@ -98,19 +115,12 @@
             </tr>
         </thead>
         <tbody id="table-absensi-body">
-            <!-- Data absen dari Firebase akan otomatis muncul di sini -->
             <tr>
                 <td colspan="4" style="text-align: center; color: #888;">Belum ada data absensi hari ini.</td>
             </tr>
         </tbody>
     </table>
 </div>
-                <div class="section-title">Panel Utama Admin</div>
-                <div class="menu-grid">
-                    <div class="menu-item">
-                        <div class="icon-wrapper admin-icon"><i class="fa-solid fa-chart-line"></i></div>
-                        <span>Pantau Kerja</span>
-                    </div>
                     <div class="menu-item">
                         <div class="icon-wrapper admin-icon"><i class="fa-solid fa-users"></i></div>
                         <span>Data Staff</span>
