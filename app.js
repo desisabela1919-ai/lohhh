@@ -2,15 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// GANTI DENGAN CONFIG DATA FIREBASE KAMU SENDIRI
+// CONFIG DATA FIREBASE KAMU
 const firebaseConfig = {
-  apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
-  authDomain: "clean-isabel-app-eaca6.firebaseapp.com",
-  databaseURL: "https://clean-isabel-app-eaca6-default-rtdb.firebaseio.com",
-  projectId: "clean-isabel-app-eaca6",
-  storageBucket: "clean-isabel-app-eaca6.firebasestorage.app",
-  messagingSenderId: "929083923327",
-  appId: "1:929083923327:web:3ebff1bbdd42eb3494984a"
+    apiKey: "PASTE_API_KEY_KAMU",
+    authDomain: "PASTE_AUTH_DOMAIN_KAMU",
+    databaseURL: "PASTE_DATABASE_URL_KAMU",
+    projectId: "PASTE_PROJECT_ID_KAMU",
+    storageBucket: "PASTE_STORAGE_BUCKET_KAMU",
+    messagingSenderId: "PASTE_MESSAGING_SENDER_ID_KAMU",
+    appId: "PASTE_APP_ID_KAMU"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -51,7 +51,6 @@ onValue(ref(db, 'daftar_gedung'), (snapshot) => {
             if(selectRegLokasi) selectRegLokasi.innerHTML += `<option value="${idGedung}">${namaTampil}</option>`;
             if(selectAdminInputArea) selectAdminInputArea.innerHTML += `<option value="${idGedung}">${namaTampil}</option>`;
             
-            // Render ke tabel manajemen gedung khusus admin pusat
             if(tbodyGedungMaster) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -66,7 +65,7 @@ onValue(ref(db, 'daftar_gedung'), (snapshot) => {
     }
 });
 
-// Registrasi Akun Mandiri (Menyimpan Jabatan Request)
+// Registrasi Akun Mandiri
 document.getElementById('btn-submit-daftar').onclick = () => {
     const nama = document.getElementById('reg-nama').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -81,7 +80,7 @@ document.getElementById('btn-submit-daftar').onclick = () => {
             set(ref(db, `users_profile/${userCredential.user.uid}`), {
                 nama: nama, email: email, gedung: lokasi, shift: "Pagi", status: "Pending", role: roleDipilih, tgl_status: "-"
             }).then(() => {
-                alert(`Pendaftaran sebagai [${roleDipilih}] berhasil! Hubungi Admin Pusat untuk aktivasi.`);
+                alert(`Pendaftaran berhasil! Hubungi Admin Pusat untuk aktivasi.`);
                 signOut(auth);
                 document.getElementById('form-daftar-karyawan').style.display = 'none';
                 loginForm.reset();
@@ -92,16 +91,14 @@ document.getElementById('btn-submit-daftar').onclick = () => {
 // Login
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const emailInput = document.getElementById('login-email').value;
-    const passInput = document.getElementById('login-password').value;
-    signInWithEmailAndPassword(auth, emailInput, passInput).catch((err) => {
+    signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value).catch((err) => {
         document.getElementById('login-error').textContent = "Login Gagal: " + err.message;
     });
 });
 
 btnLogout.addEventListener('click', () => { signOut(auth); });
 
-// Routing Sistem - MEMASTIKAN HALAMAN LOGIN HILANG SAAT SUDAH MASUK
+// Routing Sistem Utama
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUserUID = user.uid;
@@ -109,11 +106,9 @@ onAuthStateChanged(auth, (user) => {
             const profil = snapshot.val();
             if (profil && (profil.status === "Aktif" || profil.status === "Nonaktif (Masa Tenggang)")) {
                 
-                // Jika dia masuk masa tenggang, blokir akses masuk aplikasi klien
                 if(profil.status === "Nonaktif (Masa Tenggang)") {
-                    alert(`Akun Anda dinonaktifkan karena pemutusan kemitraan gedung. Masa tenggang data berlaku 3 bulan untuk sisa pembayaran gaji/administrasi. Hubungi Admin Pusat.`);
-                    signOut(auth);
-                    return;
+                    alert(`Akun Anda masuk masa tenggang data gaji 3 bulan.`);
+                    signOut(auth); return;
                 }
 
                 userRoleKunci = profil.role; 
@@ -125,22 +120,22 @@ onAuthStateChanged(auth, (user) => {
 
                 if (userRoleKunci === "Karyawan") {
                     mainHeader.style.display = 'block';
-                    userDisplayEmail.textContent = `${profil.nama} [${profil.role}]`;
+                    userDisplayEmail.textContent = `${profil.nama} [${userGedungKunci.replace(/_-_/g, ' ')}]`;
                     roleTitle.innerHTML = `Smart Clean Hub - Karyawan`;
                     karyawanSection.style.display = 'block'; 
                     adminSection.style.display = 'none';
-                    aktifkanFiturKaryawan();
+                    resetHalamanKaryawan();
+                    aktifkanFiturKaryawan(profil.nama);
                 } else {
                     mainHeader.style.display = 'block'; 
-                    userDisplayEmail.textContent = `${profil.nama} [${profil.role}]`;
+                    userDisplayEmail.textContent = `${profil.nama} [Pusat Control]`;
                     roleTitle.innerHTML = userRoleKunci === "Admin Pusat" ? 'Smart Clean Hub - Pusat ⭐' : 'Smart Clean Hub - Admin Gedung 🏢';
                     adminSection.style.display = 'block'; 
                     karyawanSection.style.display = 'none';
                     aktifkanFiturAdmin();
                 }
             } else if (profil && profil.status === "Pending") {
-                alert("Akun Anda belum disetujui/di-approve oleh Admin Pusat."); 
-                signOut(auth);
+                alert("Akun Anda belum disetujui."); signOut(auth);
             } else {
                 if(user.email.includes("admin")) {
                     set(ref(db, `users_profile/${user.uid}`), { nama: "Admin Utama", email: user.email, status: "Aktif", role: "Admin Pusat", gedung: "Semua", shift: "-", tgl_status: "-" });
@@ -148,62 +143,195 @@ onAuthStateChanged(auth, (user) => {
             }
         });
     } else {
-        loginPage.style.display = 'block'; 
-        mainHeader.style.display = 'none';
-        adminSection.style.display = 'none'; 
-        karyawanSection.style.display = 'none';
+        loginPage.style.display = 'block'; mainHeader.style.display = 'none';
+        adminSection.style.display = 'none'; karyawanSection.style.display = 'none';
     }
 });
 
-function aktifkanFiturKaryawan() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    document.getElementById('pilih-shift').value = userShiftKunci;
-    document.getElementById('pilih-shift').disabled = true;
+// ================= MODUL OPERASIONAL DASHBOARD KARYAWAN =================
 
-    onValue(ref(db, `absensi/${userGedungKunci}/${todayStr}/${currentUserUID}`), (snapshot) => {
-        const data = snapshot.val();
+function resetHalamanKaryawan() {
+    document.getElementById('karyawan-menu-grup').style.display = 'block';
+    document.getElementById('page-tugas-rutin').style.display = 'none';
+    document.getElementById('page-laporan-isu').style.display = 'none';
+    document.getElementById('page-stok-chemical').style.display = 'none';
+    document.getElementById('page-kirim-bukti').style.display = 'none';
+}
+
+function aktifkanFiturKaryawan(namaKaryawan) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const currentMonthStr = todayStr.substring(0, 7);
+
+    // 1. LOGIKA ABSENSI DAN HITUNG HARI KERJA BULANAN REAL-TIME
+    onValue(ref(db, `absensi_global/${userGedungKunci}/${currentMonthStr}`), (snapshot) => {
+        const dataBulanIni = snapshot.val() || {};
+        let totalHariMasuk = 0;
+        let sudahAbsenHariIni = false;
+        let sudahPulangHariIni = false;
+
+        for (let tanggal in dataBulanIni) {
+            if (dataBulanIni[tanggal][currentUserUID]) {
+                totalHariMasuk++;
+                if (tanggal === todayStr) {
+                    sudahAbsenHariIni = true;
+                    if (dataBulanIni[tanggal][currentUserUID].pulang) {
+                        sudahPulangHariIni = true;
+                    }
+                }
+            }
+        }
+
+        document.getElementById('total-hari-kerja').textContent = `${totalHariMasuk} Hari Kerja`;
         const absenStatus = document.getElementById('absen-status');
-        if (data) {
-            if (data.masuk && data.pulang) { absenStatus.className = "status-sudah-pulang"; absenStatus.textContent = `Selesai Kerja`; }
-            else if (data.masuk) { absenStatus.className = "status-sudah-masuk"; absenStatus.textContent = `Aktif Kerja (${data.masuk})`; document.getElementById('btn-absen-pulang').disabled = false; }
+
+        if (sudahAbsenHariIni && sudahPulangHariIni) {
+            absenStatus.className = "status-sudah-pulang";
+            absenStatus.textContent = `Selesai Kerja Hari Ini`;
+            document.getElementById('btn-absen-masuk').disabled = true;
+            document.getElementById('btn-absen-pulang').disabled = true;
+        } else if (sudahAbsenHariIni) {
+            absenStatus.className = "status-sudah-masuk";
+            absenStatus.textContent = `Aktif Kerja (Sudah Masuk)`;
+            document.getElementById('btn-absen-masuk').disabled = true;
+            document.getElementById('btn-absen-pulang').disabled = false;
+        } else {
+            absenStatus.className = "status-belum-absen";
+            absenStatus.textContent = `Belum Melakukan Absen Masuk`;
+            document.getElementById('btn-absen-masuk').disabled = false;
+            document.getElementById('btn-absen-pulang').disabled = true;
         }
     });
 
     document.getElementById('btn-absen-masuk').onclick = () => {
         const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        set(ref(db, `absensi/${userGedungKunci}/${todayStr}/${currentUserUID}`), { nama: auth.currentUser.email, masuk: jam, status: "Aktif", shift: userShiftKunci });
+        set(ref(db, `absensi_global/${userGedungKunci}/${currentMonthStr}/${todayStr}/${currentUserUID}`), {
+            nama: namaKaryawan, masuk: jam, shift: userShiftKunci, gedung: userGedungKunci
+        }).then(() => alert("Absen Masuk Berhasil Dikirim!"));
     };
+
     document.getElementById('btn-absen-pulang').onclick = () => {
         const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        update(ref(db, `absensi/${userGedungKunci}/${todayStr}/${currentUserUID}`), { pulang: jam, status: "Selesai" });
+        update(ref(db, `absensi_global/${userGedungKunci}/${currentMonthStr}/${todayStr}/${currentUserUID}`), {
+            pulang: jam
+        }).then(() => alert("Absen Keluar Berhasil Dikirim!"));
     };
-    renderGridAreaKaryawan(todayStr);
+
+    // 2. NAVIGASI PINDAH HALAMAN BERSIH (SUB-DASHBOARD)
+    document.getElementById('nav-tugas-rutin').onclick = () => {
+        document.getElementById('karyawan-menu-grup').style.display = 'none';
+        document.getElementById('page-tugas-rutin').style.display = 'block';
+        renderPekerjaanTerfilter(todayStr);
+    };
+    document.getElementById('nav-laporan-isu').onclick = () => {
+        document.getElementById('karyawan-menu-grup').style.display = 'none';
+        document.getElementById('page-laporan-isu').style.display = 'block';
+    };
+    document.getElementById('nav-stok-chemical').onclick = () => {
+        document.getElementById('karyawan-menu-grup').style.display = 'none';
+        document.getElementById('page-stok-chemical').style.display = 'block';
+        renderChemicalList();
+    };
+    document.getElementById('nav-kirim-bukti').onclick = () => {
+        document.getElementById('karyawan-menu-grup').style.display = 'none';
+        document.getElementById('page-kirim-bukti').style.display = 'block';
+    };
+
+    // Tombol Kembali Ke Menu Utama Karyawan
+    document.querySelectorAll('.btn-kembali').forEach(btn => {
+        btn.onclick = () => { resetHalamanKaryawan(); };
+    });
+
+    // 3. LOGIKA AKSI FORM (ISU & DOKUMENTASI)
+    document.getElementById('btn-submit-isu').onclick = () => {
+        const lok = document.getElementById('isu-nama-lokasi').value.trim();
+        const desk = document.getElementById('isu-deskripsi').value.trim();
+        if(!lok || !desk) return;
+        const idIsu = `isu_${Date.now()}`;
+        set(ref(db, `laporan_isu_gedung/${userGedungKunci}/${todayStr}/${idIsu}`), {
+            pelapor: namaKaryawan, lokasi: lok, kendala: desk, status: "Pending Keluhan", gedung: userGedungKunci
+        }).then(() => {
+            alert("Laporan Isu Terkirim Berdasarkan Gedung Asal!");
+            document.getElementById('isu-nama-lokasi').value = "";
+            document.getElementById('isu-deskripsi').value = "";
+            resetHalamanKaryawan();
+        });
+    };
+
+    document.getElementById('btn-submit-bukti').onclick = () => {
+        const linkBukti = document.getElementById('input-link-bukti').value.trim();
+        if(!linkBukti) return;
+        set(ref(db, `laporan_bukti_dokumentasi/${userGedungKunci}/${todayStr}/bukti_${Date.now()}`), {
+            oleh: namaKaryawan, link: linkBukti, gedung: userGedungKunci
+        }).then(() => {
+            alert("Link Dokumentasi Berhasil Disimpan!");
+            document.getElementById('input-link-bukti').value = "";
+            resetHalamanKaryawan();
+        });
+    };
 }
 
-function renderGridAreaKaryawan(todayStr) {
-    const grid = document.getElementById('grid-area-karyawan');
+// 4. STRUKTUR TEMPAT BERSIH / KOTOR DI TUGAS RUTIN (SISI KARYAWAN)
+function renderPekerjaanTerfilter(todayStr) {
     onValue(ref(db, `monitoring_area/${userGedungKunci}/${todayStr}`), (snapshot) => {
-        const data = snapshot.val() || {}; grid.innerHTML = "";
+        const data = snapshot.val() || {};
+        const bBelum = document.getElementById('box-belum-dikerjakan'); bBelum.innerHTML = "";
+        const bCek = document.getElementById('box-menunggu-cek'); bCek.innerHTML = "";
+        const bBersih = document.getElementById('box-selesai-bersih'); bBersih.innerHTML = "";
+        const bKotor = document.getElementById('box-kurang-bersih'); bKotor.innerHTML = "";
+
         for (let id in data) {
             const item = data[id];
-            const card = document.createElement('div'); card.className = "card-grid-area";
-            card.innerHTML = `<h4>${item.area}</h4><p>Status: <span class="badge-status">${item.status}</span></p><button class="btn-lapor-area" id="lpr-${id}">Selesai</button>`;
-            grid.appendChild(card);
-            document.getElementById(`lpr-${id}`).onclick = () => {
-                update(ref(db, `monitoring_area/${userGedungKunci}/${todayStr}/${id}`), { oleh: auth.currentUser.email.split('@')[0], status: "Butuh Check Admin" });
-            };
+            const div = document.createElement('div');
+            div.style = "background:white; padding:8px; border-radius:6px; margin-bottom:5px; box-shadow:0 1px 3px rgba(0,0,0,0.05); font-size:12px;";
+            
+            if (item.status === "Belum Dikerjakan") {
+                div.innerHTML = `<b>${item.area}</b><br><button class="btn-action-success" style="width:100%; margin-top:5px; font-size:10px;" id="act-${id}">Laporkan Selesai</button>`;
+                bBelum.appendChild(div);
+                document.getElementById(`act-${id}`).onclick = () => {
+                    update(ref(db, `monitoring_area/${userGedungKunci}/${todayStr}/${id}`), { status: "Menunggu Cek Admin", oleh: auth.currentUser.email.split('@')[0] });
+                };
+            } else if (item.status === "Menunggu Cek Admin") {
+                div.innerHTML = `<b>${item.area}</b><br><small style="color:#d39e00;"><i class="fa-solid fa-spinner fa-spin"></i> Menunggu dinilai admin...</small>`;
+                bCek.appendChild(div);
+            } else if (item.status === "Area Resmi Bersih") {
+                div.innerHTML = `<b>${item.area}</b><br><small style="color:green; font-weight:bold;"><i class="fa-solid fa-check"></i> Sudah Bersih</small>`;
+                bBersih.appendChild(div);
+            } else if (item.status === "Kurang Bersih") {
+                // Tampilkan catatan detail dari admin di bagian mana yang kotor
+                div.innerHTML = `
+                    <b style="color:red;">${item.area}</b><br>
+                    <small style="color:#721c24; background:#f8d7da; padding:2px 4px; border-radius:4px; display:inline-block; margin-top:3px;">
+                        <b>Koreksi:</b> ${item.catatan || 'Periksa kembali kebersihan area.'}
+                    </small><br>
+                    <button class="btn-action-danger" style="width:100%; margin-top:5px; font-size:10px; background:#6e707e;" id="re-${id}">Kerjakan Ulang</button>
+                `;
+                bKotor.appendChild(div);
+                document.getElementById(`re-${id}`).onclick = () => {
+                    update(ref(db, `monitoring_area/${userGedungKunci}/${todayStr}/${id}`), { status: "Belum Dikerjakan" });
+                };
+            }
         }
     });
 }
 
+function renderChemicalList() {
+    const chemicalData = { "Floor Cleaner Lemon": "4 Galon", "Glass Cleaner": "10 Botol", "Hand Soap Lavender": "2 Galon" };
+    const tbody = document.getElementById('table-chemical-body'); tbody.innerHTML = "";
+    for(let item in chemicalData) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><b>${item}</b></td><td><span class="badge-status" style="background:#f6c23e; color:#333;">${chemicalData[item]}</span></td><td><button class="btn-action-success" style="font-size:10px; padding:3px 6px;" onclick="alert('Permintaan chemical terkirim!')">Minta</button></td>`;
+        tbody.appendChild(tr);
+    }
+}
+
+// ================= MODUL CONTROL PANEL ADMIN (HAK AKSES GEDUNG + INPUT EVALUASI BAHASA INDONESIA) =================
+
 function aktifkanFiturAdmin() {
     const todayStr = new Date().toISOString().split('T')[0];
+    const currentMonthStr = todayStr.substring(0, 7);
 
-    if (userRoleKunci === "Admin Pusat") {
-        document.getElementById('block-admin-pusat-only').style.display = 'block';
-    } else {
-        document.getElementById('block-admin-pusat-only').style.display = 'none';
-    }
+    if (userRoleKunci === "Admin Pusat") { document.getElementById('block-admin-pusat-only').style.display = 'block'; }
+    else { document.getElementById('block-admin-pusat-only').style.display = 'none'; }
 
     document.getElementById('menu-pantau-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'block';
     document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'none';
@@ -217,8 +345,6 @@ function aktifkanFiturAdmin() {
         if(!kw || !tw) return;
         set(ref(db, `daftar_gedung/${kw}_-_${tw}`), { kawasan: kw, tower: tw });
         alert("Gedung Master Berhasil Disimpan!");
-        document.getElementById('input-kawasan-utama').value = "";
-        document.getElementById('input-sub-tower').value = "";
     };
 
     if(userRoleKunci === "Admin Gedung") {
@@ -230,61 +356,48 @@ function aktifkanFiturAdmin() {
         const gd = document.getElementById('input-area-pilih-gedung').value;
         const ar = document.getElementById('input-nama-area-baru').value.trim();
         if(!ar) return;
-        set(ref(db, `monitoring_area/${gd}/${todayStr}/daily_${Date.now()}`), { area: ar, status: "Belum Dikerjakan", keterangan: "-", oleh: "-", tipe: "Daily" });
+        set(ref(db, `monitoring_area/${gd}/${todayStr}/daily_${Date.now()}`), { area: ar, status: "Belum Dikerjakan", tipe: "Daily", oleh: "-" });
         alert("Sukses!");
-        document.getElementById('input-nama-area-baru').value = "";
     };
 
     document.getElementById('btn-submit-project-baru').onclick = () => {
         const gd = document.getElementById('input-area-pilih-gedung').value;
         const pj = document.getElementById('input-nama-project-baru').value.trim();
         if(!pj) return;
-        set(ref(db, `monitoring_area/${gd}/${todayStr}/proj_${Date.now()}`), { area: pj, status: "Belum Dikerjakan", keterangan: "-", oleh: "-", tipe: "Project" });
+        set(ref(db, `monitoring_area/${gd}/${todayStr}/proj_${Date.now()}`), { area: pj, status: "Belum Dikerjakan", tipe: "Project", oleh: "-" });
         alert("Sukses!");
-        document.getElementById('input-nama-project-baru').value = "";
     };
 
-    // Render Tabel Staff & Approval Karyawan (Lengkap Hitungan Sisa Masa Tenggang)
-    onValue(ref(db, 'users_profile'), (snapshot) => {
-        const users = snapshot.val(); const tbody = document.getElementById('table-approval-karyawan-body'); tbody.innerHTML = "";
-        for (let uid in users) {
-            if(users[uid].role === "Admin Pusat") continue;
-            if(userRoleKunci === "Admin Gedung" && users[uid].gedung !== userGedungKunci) continue;
+    // 1. Real-time Pantau Absensi Terpisah Per Gedung Asal
+    onValue(ref(db, 'absensi_global'), (snapshotGedungAbsen) => {
+        const rootAbsen = snapshotGedungAbsen.val() || {};
+        const tbodyAbsen = document.getElementById('table-rekap-absen-body'); tbodyAbsen.innerHTML = "";
 
-            const u = users[uid];
-            let statusBadge = "";
-            let actionButton = "";
-
-            if (u.status === "Pending") {
-                statusBadge = `<span style="color: #e74a3b; font-weight:bold;">Pending</span>`;
-                actionButton = `<button class="btn-action-success" onclick="approveAkun('${uid}')"><i class="fa-solid fa-check"></i> Approve</button>`;
-            } else if (u.status === "Aktif") {
-                statusBadge = `<span style="color: #1cc88a; font-weight:bold;">Aktif</span>`;
-                actionButton = `<button class="btn-action-danger" onclick="suspendAkun('${uid}')">Suspend</button>`;
-            } else if (u.status === "Nonaktif (Masa Tenggang)") {
-                // Logika hitung sisa hari dari 3 bulan (90 hari) masa tenggang data gaji
-                const tglSakit = new Date(u.tgl_status);
-                const tglSekarang = new Date();
-                const selisihWaktu = tglSekarang.getTime() - tglSakit.getTime();
-                const selisihHari = Math.floor(selisihWaktu / (1000 * 3600 * 24));
-                const sisaHari = 90 - selisihHari;
-
-                statusBadge = `<span style="color: #f6c23e; font-weight:bold; font-size:11px;">Masa Tenggang Gaji<br>(${sisaHari > 0 ? sisaHari : 0} Hari Sisa)</span>`;
-                actionButton = `<button class="btn-action-danger" style="background:#5a5c69;" onclick="hapusKaryawanPermanen('${uid}')">Hapus Permanen</button>`;
+        for(let idGedung in rootAbsen) {
+            if (userRoleKunci === "Admin Gedung" && idGedung !== userGedungKunci) continue;
+            
+            const dataBulan = rootAbsen[idGedung][currentMonthStr] || {};
+            for(let tgl in dataBulan) {
+                if(tgl === todayStr) {
+                    for(let uid in dataBulan[tgl]) {
+                        const r = dataBulan[tgl][uid];
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><b>${r.nama}</b></td>
+                            <td><span style="color:blue; font-weight:bold;">${idGedung.replace(/_-_/g, ' ')}</span></td>
+                            <td>${r.shift || 'Pagi'}</td>
+                            <td>Masuk: ${r.masuk || '-'} | Pulang: ${r.pulang || '-'}</td>
+                        `;
+                        tbodyAbsen.appendChild(tr);
+                    }
+                }
             }
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${u.nama}</b><br><small>${u.email}</small></td>
-                <td>Jabatan: <b>${u.role}</b><br><small>Gedung: ${u.gedung.replace(/_-_/g, ' ')}</small></td>
-                <td>${statusBadge}</td>
-                <td>${actionButton}</td>
-            `;
-            tbody.appendChild(tr);
         }
     });
 
-    // Real-time Evaluasi Kebersihan
+    let listNotifTerbaca = {};
+
+    // 2. Real-time Evaluasi Kebersihan Kerja Terpisah Per Gedung (Tombol Bersih / Kurang Bersih)
     onValue(ref(db, 'daftar_gedung'), (snapshotGedung) => {
         const listGedung = snapshotGedung.val() || {};
         const tbodyEval = document.getElementById('table-pantau-area-body'); tbodyEval.innerHTML = "";
@@ -293,17 +406,31 @@ function aktifkanFiturAdmin() {
             if(userRoleKunci === "Admin Gedung" && gd !== userGedungKunci) continue;
 
             onValue(ref(db, `monitoring_area/${gd}/${todayStr}`), (snapshotArea) => {
-                const areas = snapshotArea.val();
+                const areas = snapshotArea.val() || {};
                 for (let id in areas) {
                     const item = areas[id];
+                    
+                    if (item.status === "Menunggu Cek Admin" && !listNotifTerbaca[id]) {
+                        listNotifTerbaca[id] = true;
+                        tampilkanNotifikasiPengecekan(item.oleh, item.area, gd.replace(/_-_/g, ' '));
+                    }
+
                     const tr = document.createElement('tr');
+                    let statusTampil = item.status;
+                    let statusColor = "#d39e00";
+                    if(item.status === "Area Resmi Bersih") { statusTampil = "Bersih"; statusColor = "green"; }
+                    if(item.status === "Kurang Bersih") { statusTampil = "Kurang Bersih"; statusColor = "red"; }
+
+                    // Tampilkan info catatan di bawah area jika ada koreksi
+                    let infoCatatan = item.catatan ? `<br><small style="color:#c00;"><b>Koreksi Bagian:</b> ${item.catatan}</small>` : '';
+
                     tr.innerHTML = `
-                        <td><small>${item.oleh || '-'}</small></td>
-                        <td><b>${item.area}</b><br><small>${gd.replace(/_-_/g,' ')}</small></td>
-                        <td>${item.status}</td>
+                        <td><small><b>${item.oleh || '-'}</b></small></td>
+                        <td><b>${item.area}</b>${infoCatatan}<br><small style="color:purple; font-weight:bold;">Gedung: ${gd.replace(/_-_/g,' ')}</small></td>
+                        <td><span class="badge-status" style="background:${statusColor}; color:white;">${statusTampil}</span></td>
                         <td>
-                            <button style="background:green; color:white; font-size:10px; border:none; padding:4px; border-radius:4px; cursor:pointer;" onclick="evalArea('${gd}','${id}','Area Resmi Bersih')">Clean</button>
-                            <button style="background:red; color:white; font-size:10px; border:none; padding:4px; border-radius:4px; cursor:pointer;" onclick="evalArea('${gd}','${id}','Masih Kotor')">Dirty</button>
+                            <button style="background:green; color:white; font-size:10px; border:none; padding:4px 6px; border-radius:4px; cursor:pointer;" onclick="evalArea('${gd}','${id}','Area Resmi Bersih')"><i class="fa-solid fa-check"></i> Bersih</button>
+                            <button style="background:red; color:white; font-size:10px; border:none; padding:4px 6px; border-radius:4px; cursor:pointer;" onclick="evalArea('${gd}','${id}','Kurang Bersih')"><i class="fa-solid fa-xmark"></i> Kurang Bersih</button>
                         </td>
                     `;
                     tbodyEval.appendChild(tr);
@@ -311,52 +438,95 @@ function aktifkanFiturAdmin() {
             });
         }
     });
+
+    // 3. Render Tabel Approval Karyawan
+    onValue(ref(db, 'users_profile'), (snapshot) => {
+        const users = snapshot.val(); const tbody = document.getElementById('table-approval-karyawan-body'); tbody.innerHTML = "";
+        for (let uid in users) {
+            if(users[uid].role === "Admin Pusat") continue;
+            if(userRoleKunci === "Admin Gedung" && users[uid].gedung !== userGedungKunci) continue;
+
+            const u = users[uid];
+            let statusBadge = u.status === "Pending" ? `<span style="color:red; font-weight:bold;">Pending</span>` : `<span style="color:green; font-weight:bold;">Aktif</span>`;
+            let btnAction = u.status === "Pending" ? `<button class="btn-action-success" onclick="approveAkun('${uid}')">Approve</button>` : `<button class="btn-action-danger" onclick="suspendAkun('${uid}')">Suspend</button>`;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><b>${u.nama}</b></td><td>Gedung: ${u.gedung.replace(/_-_/g, ' ')}</td><td>${statusBadge}</td><td>${btnAction}</td>`;
+            tbody.appendChild(tr);
+        }
+    });
 }
 
-// ACTION CONTROLLER (TERMASUK LOGIKA PENGAMANAN DATA GAJI 3 BULAN)
-window.approveAkun = function(uid) {
-    update(ref(db, `users_profile/${uid}`), { status: "Aktif", tgl_status: new Date().toISOString().split('T')[0] }).then(() => alert("Akun Resmi Di-Approve & Aktif!"));
-};
+window.approveAkun = function(uid) { update(ref(db, `users_profile/${uid}`), { status: "Aktif", tgl_status: new Date().toISOString().split('T')[0] }); };
+window.suspendAkun = function(uid) { update(ref(db, `users_profile/${uid}`), { status: "Pending", tgl_status: new Date().toISOString().split('T')[0] }); };
 
-window.suspendAkun = function(uid) {
-    update(ref(db, `users_profile/${uid}`), { status: "Pending", tgl_status: new Date().toISOString().split('T')[0] }).then(() => alert("Akses Di-Nonaktifkan!"));
-};
-
-window.hapusKaryawanPermanen = function(uid) {
-    if(confirm("Apakah sisa gaji dan administrasi karyawan ini sudah selesai? Data akan dihapus permanen.")) {
-        remove(ref(db, `users_profile/${uid}`)).then(() => alert("Data karyawan resmi dibersihkan dari server pusat."));
+// LOGIKA EVALUASI BARU DENGAN KONSTRUKSI ARSIP CATATAN
+window.evalArea = function(gedung, id, status) { 
+    const todayStr = new Date().toISOString().split('T')[0]; 
+    
+    if (status === "Kurang Bersih") {
+        // Minta input note lokasi spesifik yang masih kotor
+        const catatanNote = prompt("Tuliskan catatan koreksi (Contoh: Wastafel bawah masih ada noda air/kerak):");
+        
+        if (catatanNote === null) return; // Batalkan aksi jika admin klik cancel
+        if (catatanNote.trim() === "") {
+            alert("Gagal menyimpan! Wajib memberikan catatan jika area dinilai kurang bersih.");
+            return;
+        }
+        
+        update(ref(db, `monitoring_area/${gedung}/${todayStr}/${id}`), { 
+            status: status,
+            catatan: catatanNote.trim()
+        });
+    } else {
+        // Jika statusnya Bersih, hilangkan catatan lama agar bersih kembali
+        update(ref(db, `monitoring_area/${gedung}/${todayStr}/${id}`), { 
+            status: status,
+            catatan: null
+        });
     }
 };
 
-window.evalArea = function(gedung, id, status) {
-    const todayStr = new Date().toISOString().split('T')[0];
-    update(ref(db, `monitoring_area/${gedung}/${todayStr}/${id}`), { status: status }).then(() => alert("Evaluasi Tersimpan!"));
-};
-
-// FITUR PUSAT: HAPUS MITRA GEDUNG, PEKERJAANNYA & AMANKAN DATA STAF 3 BULAN
 window.hapusGedungDanPekerjaan = function(idGedung) {
-    const namaBersih = idGedung.replace(/_-_/g, ' ');
-    if(confirm(`PERINGATAN UTAMA!\nApakah Anda yakin kontrak gedung "${namaBersih}" sudah tidak berlanjut?\n\nSistem otomatis akan:\n1. Menghapus Gedung Master.\n2. Menghapus seluruh Log Pekerjaan.\n3. Mengamankan data karyawan ke Masa Tenggang Gaji (3 Bulan).`)) {
-        
-        // 1. Hapus Gedung Master
+    if(confirm("Hapus gedung mitra ini? Semua data karyawan gedung ini dipindahkan ke masa tenggang sisa gaji 3 bulan.")) {
         remove(ref(db, `daftar_gedung/${idGedung}`)).then(() => {
-            // 2. Hapus seluruh pekerjaan monitoring area di gedung itu
             remove(ref(db, `monitoring_area/${idGedung}`));
-            
-            // 3. Cari karyawan di gedung tersebut dan pindahkan ke status masa tenggang
             onValue(ref(db, 'users_profile'), (snapshot) => {
                 const users = snapshot.val();
                 for(let uid in users) {
                     if(users[uid].gedung === idGedung && users[uid].role !== "Admin Pusat") {
-                        update(ref(db, `users_profile/${uid}`), {
-                            status: "Nonaktif (Masa Tenggang)",
-                            tgl_status: new Date().toISOString().split('T')[0]
-                        });
+                        update(ref(db, `users_profile/${uid}`), { status: "Nonaktif (Masa Tenggang)", tgl_status: new Date().toISOString().split('T')[0] });
                     }
                 }
             }, { onlyOnce: true });
-
-            alert(`Sukses! Gedung "${namaBersih}" dan log pekerjaan berhasil dihapus. Seluruh data staf gedung tersebut telah diamankan selama 3 bulan untuk keperluan sisa gaji.`);
         });
     }
 };
+
+function tampilkanNotifikasiPengecekan(karyawan, area, namaGedung) {
+    let containerNotif = document.getElementById('ui-notification-container');
+    if (!containerNotif) {
+        containerNotif = document.createElement('div');
+        containerNotif.id = 'ui-notification-container';
+        document.body.appendChild(containerNotif);
+    }
+
+    const boxNotif = document.createElement('div');
+    boxNotif.className = 'toast-notification-clean';
+    boxNotif.innerHTML = `
+        <div style="display:flex; gap:10px; align-items:center;">
+            <i class="fa-solid fa-bell fa-bounce" style="color:#f6c23e; font-size:18px;"></i>
+            <div>
+                <strong style="font-size:12px; color:#333;">Butuh Verifikasi!</strong>
+                <p style="margin:2px 0 0 0; font-size:11px; color:#555;">
+                    Kru <b>${karyawan}</b> melaporkan area <b>${area}</b> di <u>${namaGedung}</u> telah selesai.
+                </p>
+            </div>
+        </div>
+    `;
+    containerNotif.appendChild(boxNotif);
+    setTimeout(() => {
+        boxNotif.style.animation = 'fadeOutSlide 0.4s ease forwards';
+        setTimeout(() => { boxNotif.remove(); }, 400);
+    }, 6000);
+}
