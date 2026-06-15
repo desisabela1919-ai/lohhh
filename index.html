@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Clean Hub - Perisai Premium</title>
+    <title>Smart Clean Hub - Perisai Premium Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -20,23 +20,19 @@
 
         <main id="login-page">
             <div class="login-card">
-                <div class="shield-icon-wrapper">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
+                <div class="shield-icon-wrapper"><i class="fa-solid fa-shield-halved"></i></div>
                 <h2 class="login-title">PERISAI PREMIUM</h2>
-                <p class="login-subtitle">Smart Clean Hub</p>
+                <p class="login-subtitle">Smart Clean Hub Ops Pro</p>
 
                 <form id="login-form">
                     <div class="input-group-icon">
                         <i class="fa-solid fa-envelope"></i>
-                        <input type="email" id="login-email" placeholder="Alamat Email Resmi" required autocomplete="email">
+                        <input type="email" id="login-email" placeholder="Alamat Email Resmi" required>
                     </div>
-                    
                     <div class="input-group-icon">
                         <i class="fa-solid fa-lock"></i>
-                        <input type="password" id="login-password" placeholder="Kata Sandi Akun" required autocomplete="current-password">
+                        <input type="password" id="login-password" placeholder="Kata Sandi Akun" required>
                     </div>
-
                     <button type="submit" class="btn-primary btn-primary-shield">Masuk Sistem Aman <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
                     <div id="login-error" class="error-msg"></div>
                 </form>
@@ -48,7 +44,6 @@
 
                 <div id="form-daftar-karyawan" class="form-daftar">
                     <h3 style="margin-top:0; font-size: 15px; color: #333;"><i class="fa-solid fa-user-plus"></i> Form Pendaftaran Skuad</h3>
-                    
                     <input type="text" id="reg-nama" placeholder="Nama Lengkap Sesuai KTP">
                     <input type="email" id="reg-email" placeholder="Email Baru">
                     <input type="password" id="reg-password" placeholder="Password Baru">
@@ -60,8 +55,7 @@
                     </select>
 
                     <label style="font-size: 11px; font-weight: bold; color: #555;">Lokasi Gedung Penugasan:</label>
-                    <select id="reg-lokasi">
-                        </select>
+                    <select id="reg-lokasi"></select>
 
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
                         <button type="button" id="btn-submit-daftar" class="btn-success">Kirim Data</button>
@@ -75,103 +69,137 @@
             
             <div id="karyawan-menu-grup">
                 <div class="grid-absen-full" style="margin-bottom: 20px;">
-                    <h3 style="margin-top: 0; font-size: 14px; color: #333;"><i class="fa-solid fa-fingerprint"></i> Kartu Absensi Bulan Ini</h3>
-                    <div style="background: #e8f0fe; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-                        <span style="font-size: 12px; color: #555;">Total Kehadiran Berjalan:</span>
-                        <h2 id="total-hari-kerja" style="margin: 5px 0 0 0; color: var(--primary);">0 Hari Kerja</h2>
+                    <h3 style="margin-top: 0; font-size: 14px; color: #333;"><i class="fa-solid fa-fingerprint"></i> Kartu Presisi Absensi</h3>
+                    <div style="background: #e8f0fe; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 11px; color: #555; display:block; text-align:left;">Shift Aktif:</span>
+                            <strong id="karyawan-shift-label" style="color:var(--primary); font-size:14px;">Memuat...</strong>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 11px; color: #555; display:block;">Total Kehadiran:</span>
+                            <strong id="total-hari-kerja" style="color: var(--success); font-size:14px;">0 Hari</strong>
+                        </div>
                     </div>
                     <p id="absen-status" class="status-belum-absen">Belum Melakukan Absen Masuk</p>
                     <div class="btn-absen-container">
                         <button id="btn-absen-masuk" class="btn-masuk"><i class="fa-solid fa-right-to-bracket"></i> Absen Masuk</button>
                         <button id="btn-absen-pulang" class="btn-pulang" disabled><i class="fa-solid fa-right-from-bracket"></i> Absen Keluar</button>
                     </div>
+                    
+                    <button id="btn-sos-karyawan" class="btn-danger" style="width: 100%; margin-top: 12px; border-radius: 8px; font-size: 13px;"><i class="fa-solid fa-triangle-exclamation fa-flash"></i> EMERGENCY / SOS SYSTEM</button>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="menu-item-compact" id="nav-tugas-rutin" style="padding: 20px 10px;">
+                    <div class="menu-item-compact" id="nav-tugas-rutin">
                         <div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div>
-                        <b>Tugas Rutin</b>
+                        <b>Tugas Skuad</b>
                     </div>
-                    <div class="menu-item-compact" id="nav-laporan-isu" style="padding: 20px 10px;">
+                    <div class="menu-item-compact" id="nav-panduan-digital">
+                        <div class="icon-wrapper-compact icon-stok" style="background:#6f42c1;"><i class="fa-solid fa-book"></i></div>
+                        <b>SOP & RKB</b>
+                    </div>
+                    <div class="menu-item-compact" id="nav-laporan-isu">
                         <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <b>Laporan Isu</b>
                     </div>
-                    <div class="menu-item-compact" id="nav-stok-chemical" style="padding: 20px 10px;">
+                    <div class="menu-item-compact" id="nav-stok-chemical">
                         <div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-flask"></i></div>
-                        <b>Stok Chemical</b>
+                        <b>Log Chemical</b>
                     </div>
-                    <div class="menu-item-compact" id="nav-kirim-bukti" style="padding: 20px 10px;">
+                    <div class="menu-item-compact" id="nav-kirim-bukti" style="grid-column: span 2;">
                         <div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div>
-                        <b>Kirim Bukti</b>
+                        <b>Kirim Bukti Progres Multi-Foto</b>
                     </div>
                 </div>
             </div>
 
             <div id="page-tugas-rutin" class="pop-up-admin" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin:0; font-size:15px; color:var(--primary);"><i class="fa-solid fa-list-check"></i> Monitoring Pekerjaan</h3>
-                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                    <h3 style="margin:0; font-size:14px; color:var(--primary);"><i class="fa-solid fa-list-check"></i> Area Kerja Anda</h3>
+                    <button class="btn-secondary btn-kembali" style="padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
                 </div>
-                
                 <div class="form-admin-block" style="border-left:4px solid var(--danger); background:#fff5f5;">
-                    <h5 style="margin:0 0 8px 0; color:var(--danger); text-transform:uppercase;"><i class="fa-regular fa-clock"></i> Belum Dikerjakan</h5>
+                    <h5 style="margin:0 0 8px 0; color:var(--danger);"><i class="fa-regular fa-clock"></i> Belum Dikerjakan</h5>
                     <div id="box-belum-dikerjakan" class="grid-sub-pekerjaan"></div>
                 </div>
-
                 <div class="form-admin-block" style="border-left:4px solid var(--warning); background:#fffdf0;">
-                    <h5 style="margin:0 0 8px 0; color:#d39e00; text-transform:uppercase;"><i class="fa-solid fa-spinner fa-spin"></i> Menunggu Dicek Admin</h5>
+                    <h5 style="margin:0 0 8px 0; color:#d39e00;"><i class="fa-solid fa-spinner fa-spin"></i> Menunggu Konfirmasi</h5>
                     <div id="box-menunggu-cek" class="grid-sub-pekerjaan"></div>
                 </div>
-
                 <div class="form-admin-block" style="border-left:4px solid var(--success); background:#f0fff4;">
-                    <h5 style="margin:0 0 8px 0; color:var(--success); text-transform:uppercase;"><i class="fa-solid fa-square-check"></i> Sudah Bersih (Clean)</h5>
-                    <div id="box-selesai-bersih" class="grid-sub-pekerjaan"></div>
+                    <h5 style="margin:0 0 8px 0; color:var(--success);"><i class="fa-solid fa-square-check"></i> Sudah Bersih</h5>
+                    <div id="box-selesai-clean" class="grid-sub-pekerjaan"></div>
                 </div>
-
                 <div class="form-admin-block" style="border-left:4px solid #6e707e; background:#f4f5f7;">
-                    <h5 style="margin:0 0 8px 0; color:#3a3b45; text-transform:uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Kurang Bersih (Dirty)</h5>
+                    <h5 style="margin:0 0 8px 0; color:#3a3b45;"><i class="fa-solid fa-circle-exclamation"></i> Kurang Bersih (Koreksi)</h5>
                     <div id="box-kurang-bersih" class="grid-sub-pekerjaan"></div>
+                </div>
+            </div>
+
+            <div id="page-panduan-digital" class="pop-up-admin" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:14px; color:#6f42c1;"><i class="fa-solid fa-book"></i> Portal SOP, RKB & Standar</h3>
+                    <button class="btn-secondary btn-kembali" style="padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                </div>
+                <div class="flex-column-gap">
+                    <a href="https://docs.google.com/spreadsheets/d/YOUR_SOP_LINK" target="_blank" class="menu-item-compact" style="text-decoration:none; color:inherit; text-align:left; display:flex; align-items:center; gap:15px;">
+                        <i class="fa-solid fa-file-shield" style="font-size:24px; color:#6f42c1;"></i>
+                        <div><strong>SOP Digital Kebersihan</strong><br><small style="color:#666;">Standard Operating Procedure Lapangan</small></div>
+                    </a>
+                    <a href="https://docs.google.com/spreadsheets/d/YOUR_RKB_LINK" target="_blank" class="menu-item-compact" style="text-decoration:none; color:inherit; text-align:left; display:flex; align-items:center; gap:15px;">
+                        <i class="fa-solid fa-calendar-check" style="font-size:24px; color:var(--success);"></i>
+                        <div><strong>Rencana Kerja Bulanan (RKB)</strong><br><small style="color:#666;">Target dan Timeline Kerja Bulanan</small></div>
+                    </a>
+                    <a href="https://docs.google.com/spreadsheets/d/YOUR_STANDAR_LINK" target="_blank" class="menu-item-compact" style="text-decoration:none; color:inherit; text-align:left; display:flex; align-items:center; gap:15px;">
+                        <i class="fa-solid fa-star" style="font-size:24px; color:var(--warning);"></i>
+                        <div><strong>Standar Kebersihan Mutu</strong><br><small style="color:#666;">Kriteria Penilaian Bersih & Lulus Cek</small></div>
+                    </a>
                 </div>
             </div>
 
             <div id="page-laporan-isu" class="pop-up-admin" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin:0; font-size:15px; color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Laporan Isu Gedung</h3>
-                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                    <h3 style="margin:0; font-size:14px; color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Laporan Isu</h3>
+                    <button class="btn-secondary btn-kembali" style="padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
                 </div>
                 <input type="text" id="isu-nama-lokasi" placeholder="Lokasi Spesifik (cth: Toilet Lantai 2)">
-                <textarea id="isu-deskripsi" placeholder="Deskripsikan kerusakan atau kendala lapangan..." style="width:100%; height:80px; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box; font-family:inherit; margin-bottom:10px;"></textarea>
-                <button id="btn-submit-isu" class="btn-danger">Kirim Laporan Kendala</button>
+                <textarea id="isu-deskripsi" placeholder="Deskripsikan kendala lapangan..." style="width:100%; height:80px; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box; margin-bottom:10px;"></textarea>
+                <button id="btn-submit-isu" class="btn-danger">Kirim Keluhan</button>
             </div>
 
             <div id="page-stok-chemical" class="pop-up-admin" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin:0; font-size:15px; color:#d39e00;"><i class="fa-solid fa-flask"></i> Pemakaian Chemical</h3>
-                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                    <h3 style="margin:0; font-size:14px; color:#d39e00;"><i class="fa-solid fa-flask"></i> Log Pakai Chemical</h3>
+                    <button class="btn-secondary btn-kembali" style="padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
                 </div>
-                <div class="table-container-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nama Material</th>
-                                <th>Stok Gudang</th>
-                                <th>Aksi Request</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-chemical-body">
-                            </tbody>
-                    </table>
+                <div class="form-admin-block" style="padding:10px; margin-bottom:10px;">
+                    <label style="font-size:11px; font-weight:bold;">Pilih Chemical:</label>
+                    <select id="input-log-chem-nama" style="width:100%; padding:6px; margin-bottom:8px; border-radius:4px;">
+                        <option value="Glass Cleaner">Glass Cleaner</option>
+                        <option value="Floor Cleaner Lemon">Floor Cleaner Lemon</option>
+                        <option value="Hand Soap Lavender">Hand Soap Lavender</option>
+                    </select>
+                    <label style="font-size:11px; font-weight:bold;">Volume Pemakaian (ml / Pcs):</label>
+                    <input type="number" id="input-log-chem-vol" placeholder="Contoh: 200" style="width:100%; padding:6px; margin-bottom:10px; border-radius:4px; border:1px solid #ccc;">
+                    <button id="btn-submit-log-chemical" class="btn-warning" style="width:100%; font-size:12px;">Simpan Pemakaian Hari Ini</button>
                 </div>
             </div>
 
             <div id="page-kirim-bukti" class="pop-up-admin" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin:0; font-size:15px; color:var(--success);"><i class="fa-solid fa-camera"></i> Kirim Bukti Dokumentasi</h3>
-                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                    <h3 style="margin:0; font-size:14px; color:var(--success);"><i class="fa-solid fa-camera"></i> Dokumen Progres Multi-Foto</h3>
+                    <button class="btn-secondary btn-kembali" style="padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
                 </div>
-                <p style="font-size:12px; color:#666;">Silakan tempel tautan foto/drive dokumentasi pekerjaan harian kamu di bawah ini:</p>
-                <input type="text" id="input-link-bukti" placeholder="https://link-foto-pekerjaan.com atau WhatsApp link">
-                <button id="btn-submit-bukti" class="btn-success">Kirim Link Dokumentasi</button>
+                <label style="font-size:11px; font-weight:bold;">Pilih Area Kerja Terkait:</label>
+                <select id="select-bukti-area" style="width:100%; padding:8px; border-radius:6px; margin-bottom:10px;"></select>
+                
+                <p style="font-size:11px; color:#666; margin:5px 0;">Tempel link foto progres satu per satu (Bisa kirim 5-15 foto):</p>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <input type="text" id="input-multi-link-foto" placeholder="https://link-foto-pekerjaan.com" style="margin:0;">
+                    <button id="btn-tambah-foto-list" class="btn-primary" style="padding:0 15px;">+</button>
+                </div>
+                <div id="preview-list-tautan" style="background:#fff; border:1px solid #e3e6f0; padding:8px; border-radius:6px; max-height:100px; overflow-y:auto; font-size:11px; margin-bottom:10px;"></div>
+                <button id="btn-submit-multi-bukti" class="btn-success" style="width:100%;">Kirim Seluruh Bukti Foto</button>
             </div>
 
         </section>
@@ -191,24 +219,19 @@
 
             <div id="block-admin-pusat-only" style="display: none;">
                 <div class="form-admin-block border-info-block">
-                    <h4 class="form-admin-title title-info"><i class="fa-solid fa-square-plus"></i> Tambah Mitra Kawasan Gedung Baru</h4>
+                    <h4 class="form-admin-title title-info"><i class="fa-solid fa-square-plus"></i> Kawasan Gedung Mitra Baru</h4>
                     <div class="flex-column-gap">
-                        <input type="text" id="input-kawasan-utama" class="input-compact" placeholder="Contoh: Gedung_A, Gedung_B">
-                        <input type="text" id="input-sub-tower" class="input-compact" placeholder="Contoh: Tower_1, Lantai_Dasar">
-                        <button id="btn-submit-gedung-baru" class="btn-info" style="padding:8px; font-size:12px;">Simpan Gedung Master</button>
+                        <input type="text" id="input-kawasan-utama" class="input-compact" placeholder="Nama Gedung / Kawasan">
+                        <input type="text" id="input-sub-tower" class="input-compact" placeholder="Nama Tower / Lantai">
+                        <button id="btn-submit-gedung-baru" class="btn-info" style="padding:8px; font-size:12px;">Simpan Mitra Master</button>
                     </div>
                 </div>
 
                 <div class="form-admin-block border-danger-block">
-                    <h4 class="form-admin-title" style="color: var(--danger);"><i class="fa-solid fa-building-circle-xmark"></i> Manajemen Kontrak Kemitraan Gedung</h4>
+                    <h4 class="form-admin-title" style="color: var(--danger);"><i class="fa-solid fa-building-circle-xmark"></i> Manajemen Kontrak</h4>
                     <div class="table-container-scroll">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Nama Gedung Mitra</th>
-                                    <th>Aksi Kontrol</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Nama Gedung Mitra</th><th>Aksi</th></tr></thead>
                             <tbody id="table-master-gedung-body"></tbody>
                         </table>
                     </div>
@@ -216,34 +239,29 @@
             </div>
 
             <div class="form-admin-block" style="border-left: 4px solid var(--warning);">
-                <h4 class="form-admin-title" style="color:#d39e00;"><i class="fa-solid fa-folder-plus"></i> Distribusi Target Kerja Lapangan</h4>
+                <h4 class="form-admin-title" style="color:#d39e00;"><i class="fa-solid fa-folder-plus"></i> Manajemen Target & Scheduling Skuad</h4>
                 <div class="flex-column-gap" style="margin-bottom: 10px;">
-                    <label style="font-size:11px; font-weight:bold; color:#555;">Pilih Gedung Sasaran:</label>
+                    <label style="font-size:11px; font-weight:bold;">Pilih Gedung:</label>
                     <select id="input-area-pilih-gedung" class="input-compact"></select>
                 </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div>
-                        <input type="text" id="input-nama-area-baru" class="input-compact" placeholder="Nama Area (cth: Lobby)">
-                        <button id="btn-submit-area-baru" class="btn-primary" style="padding:6px; font-size:11px; margin-top:5px;">+ Target Daily</button>
-                    </div>
-                    <div>
-                        <input type="text" id="input-nama-project-baru" class="input-compact" placeholder="Nama Project (cth: Kristalisasi)">
-                        <button id="btn-submit-project-baru" class="btn-success" style="padding:6px; font-size:11px; margin-top:5px;">+ Target Project</button>
-                    </div>
+                <div class="form-admin-block" style="background:#f8f9fc; padding:8px; border:1px solid #e3e6f0;">
+                    <label style="font-size:11px; font-weight:bold;">Nama Skuad Lapangan:</label>
+                    <input type="text" id="input-target-nama-skuad" class="input-compact" placeholder="cth: Adriansyah (Ketik Sesuai Nama Profil)">
+                    <input type="text" id="input-nama-area-baru" class="input-compact" placeholder="Nama Area Spesifik (cth: Lobby Utama)" style="margin-top:5px;">
+                    <button id="btn-submit-area-baru" class="btn-primary" style="padding:6px; font-size:11px; margin-top:5px; width:100%;">+ Berikan Tugas Harian</button>
                 </div>
             </div>
 
             <div class="form-admin-block border-info-block">
-                <h4 class="form-admin-title title-info"><i class="fa-solid fa-user-shield"></i> Validasi Anggota & Status Skuad</h4>
+                <h4 class="form-admin-title title-info"><i class="fa-solid fa-user-shield"></i> Validasi Skuad & Set Jadwal 4 Shift</h4>
                 <div class="table-container-scroll">
                     <table>
                         <thead>
                             <tr>
                                 <th>Profil Skuad</th>
-                                <th>Jabatan & Gedung</th>
-                                <th>Status</th>
-                                <th>Aksi Kelola</th>
+                                <th>Gedung</th>
+                                <th>Atur Shift</th>
+                                <th>Aksi Status</th>
                             </tr>
                         </thead>
                         <tbody id="table-approval-karyawan-body"></tbody>
@@ -251,40 +269,53 @@
                 </div>
             </div>
 
-            <div id="halaman-pantau-kerja-admin" class="pop-up-admin" style="display: none;">
-                <h3 style="margin-top: 0; font-size: 14px; color: var(--info);"><i class="fa-solid fa-wand-magic-sparkles"></i> Evaluasi Hasil Kebersihan Real-Time</h3>
+            <div class="form-admin-block border-dark-block" style="border-left: 4px solid var(--dark);">
+                <h4 class="form-admin-title" style="color:var(--dark);"><i class="fa-solid fa-book-open"></i> Log Buku Pemakaian Chemical Global</h4>
                 <div class="table-container-scroll">
+                    <table>
+                        <thead><tr><th>Waktu Record</th><th>Nama Skuad</th><th>Chemical</th><th>Volume</th></tr></thead>
+                        <tbody id="table-admin-chemical-log-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="halaman-pantau-kerja-admin" class="pop-up-admin" style="display: none;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin: 0; font-size: 14px; color: var(--info);"><i class="fa-solid fa-wand-magic-sparkles"></i> Evaluasi Kerja & Download Galeri</h3>
+                    <button id="btn-export-laporan-foto" class="btn-success" style="font-size:11px; padding:4px 8px;"><i class="fa-solid fa-file-arrow-down"></i> Download Semua Foto Progres</button>
+                </div>
+                <div class="table-container-scroll" style="margin-top:10px;">
                     <table>
                         <thead>
                             <tr>
-                                <th>Oleh</th>
-                                <th>Nama Area / Gedung</th>
-                                <th>Status Lapangan</th>
-                                <th>Konfirmasi Admin</th>
+                                <th>Skuad & Waktu</th>
+                                <th>Area / Gedung</th>
+                                <th>Galeri Foto Progres</th>
+                                <th>Evaluasi Admin</th>
                             </tr>
                         </thead>
                         <tbody id="table-pantau-area-body"></tbody>
                     </table>
                 </div>
-                <button id="btn-tutup-pantau-kerja" class="btn-secondary" style="padding: 6px; font-size:12px; margin-top:10px;">Tutup Panel Monitor</button>
+                <button id="btn-tutup-pantau-kerja" class="btn-secondary" style="padding: 6px; font-size:12px; margin-top:10px; width:100%;">Tutup Panel Monitor</button>
             </div>
 
             <div id="halaman-detail-absensi" class="pop-up-admin" style="display: none;">
-                <h3 style="margin-top:0; font-size:14px; color:var(--success);"><i class="fa-solid fa-clock-rotate-left"></i> Monitor Jam Absensi Skuad</h3>
+                <h3 style="margin-top:0; font-size:14px; color:var(--success);"><i class="fa-solid fa-clock-rotate-left"></i> Monitor Jam Absensi Presisi</h3>
                 <div class="table-container-scroll">
-                    <table style="width:100%; text-align:left;">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Nama Skuad</th>
                                 <th>Asal Gedung</th>
                                 <th>Shift</th>
-                                <th>Jam Masuk / Keluar</th>
+                                <th>Detail Jam Masuk / Pulang (Lengkap)</th>
                             </tr>
                         </thead>
                         <tbody id="table-rekap-absen-body"></tbody>
                     </table>
                 </div>
-                <button id="btn-tutup-absensi" class="btn-secondary" style="padding:6px; font-size:12px; margin-top:10px;">Tutup Panel Absen</button>
+                <button id="btn-tutup-absensi" class="btn-secondary" style="padding:6px; font-size:12px; margin-top:10px; width:100%;">Tutup Panel Absen</button>
             </div>
 
         </section>
