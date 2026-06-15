@@ -3,221 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Clean Hub - Operational System</title>
-    <!-- Google Fonts & Font Awesome Icons -->
+    <title>Smart Clean Hub - Perisai Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <!-- HEADER APLIKASI (Hanya muncul jika SUDAH LOGIN) -->
-    <div id="main-header" class="header" style="display: none;">
-        <h1 id="role-title">Smart Clean Hub Portal</h1>
-        <p><i class="fa-solid fa-user-circle"></i> <span id="user-display-email">Memuat...</span></p>
-        <button id="btn-logout" class="btn-logout-inside">Logout</button>
-    </div>
+    <div class="container">
 
-    <!-- ========================================== -->
-    <!-- 🔑 PANEL LOGIN PREMIUM (SMART CLEAN HUB)   -->
-    <!-- ========================================== -->
-    <div id="login-page" class="login-card">
-        <div class="shield-icon-wrapper">
-            <i class="fa-solid fa-shield-halved"></i>
-        </div>
-        <h2 class="login-title">Smart Clean Hub</h2>
-        <p class="login-subtitle">Operational Secure Login</p>
-        
-        <form id="login-form">
-            <div class="input-group-icon">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" id="login-email" placeholder="Masukkan Email" required>
-            </div>
-            <div class="input-group-icon">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" id="login-password" placeholder="Masukkan Password" required>
-            </div>
-            <button type="submit" class="btn-primary-shield">Masuk Aplikasi</button>
-        </form>
-        <div id="login-error" class="error-msg"></div>
-        
-        <hr class="separator">
-        <p style="text-align: center; font-size: 13px; margin: 0;">Registrasi Anggota? <a href="#" id="link-buka-daftar" style="color: #4e73df; font-weight: bold; text-decoration: none;">Daftar Akun Di Sini</a></p>
+        <header id="main-header" class="header" style="display: none;">
+            <h1 id="role-title">Smart Clean Hub</h1>
+            <p id="user-display-email">mengambil data...</p>
+            <button id="btn-logout" class="btn-logout-inside"><i class="fa-solid fa-power-off"></i> Keluar Aplikasi</button>
+        </header>
 
-        <!-- Form Register Mandiri -->
-        <div id="form-daftar-karyawan" class="form-daftar">
-            <h4 style="margin-top: 0; color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px;">Form Registrasi Operasional</h4>
-            <input type="text" id="reg-nama" placeholder="Nama Lengkap Kamu">
-            <input type="email" id="reg-email" placeholder="Email Aktif">
-            <input type="password" id="reg-password" placeholder="Password Akun (Min 6 Karakter)">
-            
-            <label style="font-size: 11px; font-weight: bold; color: #555;">Pilih Jabatan Penugasan:</label>
-            <select id="reg-role">
-                <option value="Karyawan">Karyawan (Tim Lapangan)</option>
-                <option value="Admin Gedung">Admin Gedung (Supervisor / Team Leader)</option>
-            </select>
-
-            <label style="font-size: 11px; font-weight: bold; color: #555; margin-top: 5px; display: block;">Pilih Penempatan Gedung:</label>
-            <select id="reg-lokasi">
-                <!-- Dropdown terisi otomatis dari Database -->
-            </select>
-            
-            <button type="button" id="btn-submit-daftar" class="btn-success">Kirim Pendaftaran</button>
-            <button type="button" id="btn-batal-daftar" class="btn-secondary" style="margin-top: 5px; padding: 8px;">Batal</button>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 👷 SISI PANEL OPERASIONAL KARYAWAN         -->
-    <!-- ========================================== -->
-    <div id="karyawan-section" style="display: none;">
-        <div class="menu-grid-compact">
-            <div class="menu-item-compact" id="menu-karyawan-tugas"><div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div><span>Tugas Hari Ini</span></div>
-            <div class="menu-item-compact" id="menu-karyawan-isu"><div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-circle-exclamation"></i></div><span>Laporan Isu</span></div>
-            <div class="menu-item-compact" id="menu-karyawan-status-area"><div class="icon-wrapper-compact icon-staff"><i class="fa-solid fa-network-wired"></i></div><span>Status Area</span></div>
-            <div class="menu-item-compact" id="menu-karyawan-sop"><div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-book-bookmark"></i></div><span>SOP Kerja</span></div>
-            <div class="menu-item-compact" id="menu-karyawan-hama"><div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-bug"></i></div><span>Edukasi Hama</span></div>
-            <div class="menu-item-compact" id="menu-karyawan-foto"><div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div><span>Foto Kerja</span></div>
-        </div>
-
-        <!-- Menu Absen -->
-        <div class="grid-absen-full">
-            <div class="icon-wrapper-compact icon-absen"><i class="fa-solid fa-clock"></i></div>
-            <span style="font-weight: bold; font-size: 14px;">Menu Absensi Kerja</span><br>
-            <span id="absen-status" class="status-belum-absen">Belum Absen</span>
-            
-            <div id="container-pilih-shift" style="margin: 10px 0; text-align: left;">
-                <label style="font-size: 11px; font-weight: bold; color: #666;">Shift Penugasan Kamu:</label>
-                <select id="pilih-shift">
-                    <option value="Pagi">Shift Pagi (Daily Cleaning)</option>
-                    <option value="Middle">Shift Middle (Khusus Project)</option>
-                    <option value="Sore">Shift Sore (Daily Cleaning)</option>
-                </select>
-            </div>
-
-            <div class="btn-absen-container">
-                <button id="btn-absen-masuk" class="btn-masuk">Absen Masuk</button>
-                <button id="btn-absen-pulang" class="btn-pulang" disabled>Absen Pulang</button>
-            </div>
-        </div>
-
-        <!-- Live Alert Monitor -->
-        <div id="area-feedback" style="margin-top: 20px;">
-            <h4 style="margin-bottom: 8px; font-size: 14px;"><i class="fa-solid fa-bell"></i> Live Alert Monitor</h4>
-            <div id="box-notif-suara" class="notif-box-default">Menunggu pembaruan...</div>
-        </div>
-
-        <!-- Daftar Area Kerja -->
-        <div class="grid-container-baru">
-            <h3 style="color: #333; margin-bottom: 5px; font-size: 16px; font-weight: bold;">
-                <i class="fa-solid fa-layer-group"></i> <span id="judul-monitoring-area">Daftar Kerja Area</span>
-            </h3>
-            <div id="grid-area-karyawan"></div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 🏢 PANEL ADMIN (GEDUNG & PUSAT)            -->
-    <!-- ========================================== -->
-    <div id="admin-section" style="display: none;">
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button id="menu-pantau-absensi" class="btn-success"><i class="fa-solid fa-clipboard-user"></i> Monitor Absen</button>
-            <button id="menu-admin-pantau-kerja" class="btn-primary"><i class="fa-solid fa-chart-line"></i> Manajemen Kontrol</button>
-        </div>
-
-        <!-- Pop-up 1: Monitor Absensi -->
-        <div id="halaman-detail-absensi" class="pop-up-admin" style="display: none;">
-            <h3 style="margin-top:0; font-size: 16px;"><i class="fa-solid fa-users"></i> Monitor Rekap Absensi</h3>
-            <table>
-                <thead>
-                    <tr style="background: #f1f3f5;">
-                        <th>Karyawan / Lokasi</th>
-                        <th>Masuk</th>
-                        <th>Pulang</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="table-absensi-body"></tbody>
-            </table>
-            <button id="btn-tutup-absensi" class="btn-danger" style="margin-top: 15px; padding: 6px;">Tutup Monitor</button>
-        </div>
-
-        <!-- Pop-up 2: Pusat Manajemen Kontrol -->
-        <div id="halaman-pantau-kerja-admin" class="pop-up-admin" style="display: none;">
-            
-            <!-- BLOCK KHUSUS ADMIN PUSAT (Master Registrasi Gedung) -->
-            <div id="block-admin-pusat-only" class="form-admin-block border-danger-block" style="display: none;">
-                <h4 class="form-admin-title title-danger"><i class="fa-solid fa-building-shield"></i> [PUSAT] Registrasi Master Gedung Baru</h4>
-                <div class="flex-column-gap">
-                    <input type="text" id="input-kawasan-utama" placeholder="Nama Kawasan (Misal: Project_Bekasi)" class="input-compact">
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="input-sub-tower" placeholder="Nama Blok/Gedung (Misal: Gedung_Merdeka)" class="input-compact">
-                        <button id="btn-submit-gedung-baru" class="btn-danger btn-auto-width">Simpan Gedung</button>
-                    </div>
+        <main id="login-page">
+            <div class="login-card">
+                <div class="shield-icon-wrapper">
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
-            </div>
+                <h2 class="login-title">PERISAI PREMIUM</h2>
+                <p class="login-subtitle">Smart Clean Hub</p>
 
-            <!-- FORM INPUT OPERASIONAL (Bisa diakses Admin Gedung & Pusat) -->
-            <div id="block-input-operasional" class="form-admin-block border-info-block">
-                <h4 class="form-admin-title title-info"><i class="fa-solid fa-map-location-dot"></i> Input Tugas & Area Kerja Harian</h4>
-                <div class="flex-column-gap">
-                    <label style="font-size: 11px; font-weight: bold;">Pilih Lokasi Kerja:</label>
-                    <select id="input-area-pilih-gedung" class="input-compact" style="padding:6px;"></select>
+                <form id="login-form">
+                    <div class="input-group-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="login-email" placeholder="Alamat Email Resmi" required autocomplete="email">
+                    </div>
                     
-                    <div style="background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #eee; margin-top: 5px;">
-                        <span style="font-size: 11px; font-weight: bold; color: #555;">A. Tambah Area Daily (Shift Pagi/Sore)</span>
-                        <div style="display: flex; gap: 8px; margin-top: 4px;">
-                            <input type="text" id="input-nama-area-baru" placeholder="Contoh: Toilet Lobby" class="input-compact">
-                            <button id="btn-submit-area-baru" class="btn-info btn-auto-width">Tambah</button>
-                        </div>
+                    <div class="input-group-icon">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Kata Sandi Akun" required autocomplete="current-password">
                     </div>
 
-                    <div style="background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #eee; margin-top: 5px;">
-                        <span style="font-size: 11px; font-weight: bold; color: #555;">B. Tambah Project Khusus (Shift Middle)</span>
-                        <div style="display: flex; gap: 8px; margin-top: 4px;">
-                            <input type="text" id="input-nama-project-baru" placeholder="Contoh: Poles Marmer" class="input-compact">
-                            <button id="btn-submit-project-baru" class="btn-success btn-auto-width">Tambah</button>
-                        </div>
+                    <button type="submit" class="btn-primary btn-primary-shield">Masuk Sistem Aman <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+                    <div id="login-error" class="error-msg"></div>
+                </form>
+
+                <hr class="separator">
+                <p style="font-size: 13px; color: #666;">
+                    Anggota Baru? <a href="#" id="link-buka-daftar" style="color: var(--primary); font-weight: 600; text-decoration: none;">Daftar Akun Mandiri</a>
+                </p>
+
+                <div id="form-daftar-karyawan" class="form-daftar">
+                    <h3 style="margin-top:0; font-size: 15px; color: #333;"><i class="fa-solid fa-user-plus"></i> Form Pendaftaran Skuad</h3>
+                    
+                    <input type="text" id="reg-nama" placeholder="Nama Lengkap Sesuai KTP">
+                    <input type="email" id="reg-email" placeholder="Email Baru">
+                    <input type="password" id="reg-password" placeholder="Password Baru">
+                    
+                    <label style="font-size: 11px; font-weight: bold; color: #555;">Request Jabatan Pembuat:</label>
+                    <select id="reg-role">
+                        <option value="Karyawan">Karyawan (Kru Lapangan)</option>
+                        <option value="Admin Gedung">Admin Gedung (Supervisor)</option>
+                    </select>
+
+                    <label style="font-size: 11px; font-weight: bold; color: #555;">Lokasi Gedung Penugasan:</label>
+                    <select id="reg-lokasi">
+                        </select>
+
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" id="btn-submit-daftar" class="btn-success">Kirim Data</button>
+                        <button type="button" id="btn-batal-daftar" class="btn-secondary">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <section id="karyawan-section" style="display: none;">
+            <div class="menu-grid-compact">
+                <div class="menu-item-compact">
+                    <div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div>
+                    Tugas Rutin
+                </div>
+                <div class="menu-item-compact">
+                    <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    Lapor Isu
+                </div>
+                <div class="menu-item-compact">
+                    <div class="icon-wrapper-compact icon-staff"><i class="fa-solid fa-users"></i></div>
+                    Tim Kerja
+                </div>
+                <div class="menu-item-compact">
+                    <div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    Stok Logistik
+                </div>
+                <div class="menu-item-compact">
+                    <div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div>
+                    Kirim Bukti
+                </div>
+                <div class="menu-item-compact">
+                    <div class="icon-wrapper-compact icon-absen"><i class="fa-solid fa-user-clock"></i></div>
+                    Riwayat
+                </div>
+            </div>
+
+            <div class="grid-absen-full">
+                <h3 style="margin-top: 0; font-size: 14px; color: #333;"><i class="fa-solid fa-fingerprint"></i> Absensi Digital Hari Ini</h3>
+                <select id="pilih-shift">
+                    <option value="Pagi">Shift Pagi</option>
+                    <option value="Middle">Shift Middle</option>
+                    <option value="Malam">Shift Malam</option>
+                </select>
+                <p id="absen-status" class="status-belum-absen">Belum Melakukan Absen Masuk</p>
+                <div class="btn-absen-container">
+                    <button id="btn-absen-masuk" class="btn-masuk"><i class="fa-solid fa-right-to-bracket"></i> Absen Masuk</button>
+                    <button id="btn-absen-pulang" class="btn-pulang" disabled><i class="fa-solid fa-right-from-bracket"></i> Absen Pulang</button>
+                </div>
+            </div>
+
+            <div class="grid-container-baru">
+                <h3 style="font-size: 14px; margin-bottom: 5px; color:#4e73df;"><i class="fa-solid fa-map-location-dot"></i> Monitoring Kerja Area Anda</h3>
+                <div id="grid-area-karyawan">
+                    </div>
+            </div>
+        </section>
+
+        <section id="admin-section" style="display: none;">
+            
+            <div class="menu-grid-compact">
+                <div class="menu-item-compact" id="menu-pantau-absensi">
+                    <div class="icon-wrapper-compact icon-tugas" style="background-color: var(--success);"><i class="fa-solid fa-clipboard-user"></i></div>
+                    Pantau Absen
+                </div>
+                <div class="menu-item-compact" id="menu-admin-pantau-kerja">
+                    <div class="icon-wrapper-compact icon-bukti" style="background-color: var(--info);"><i class="fa-solid fa-chart-line"></i></div>
+                    Evaluasi Kerja
+                </div>
+            </div>
+
+            <div id="block-admin-pusat-only" style="display: none;">
+                <div class="form-admin-block border-info-block">
+                    <h4 class="form-admin-title title-info"><i class="fa-solid fa-square-plus"></i> Tambah Mitra Kawasan Gedung Baru</h4>
+                    <div class="flex-column-gap">
+                        <input type="text" id="input-kawasan-utama" class="input-compact" placeholder="Contoh: Isabela, Clean_Solution">
+                        <input type="text" id="input-sub-tower" class="input-compact" placeholder="Contoh: Tower_A, Lantai_1">
+                        <button id="btn-submit-gedung-baru" class="btn-info" style="padding:8px; font-size:12px;">Simpan Gedung Master</button>
+                    </div>
+                </div>
+
+                <div class="form-admin-block border-danger-block">
+                    <h4 class="form-admin-title" style="color: var(--danger);"><i class="fa-solid fa-building-circle-xmark"></i> Manajemen Kontrak Kemitraan Gedung</h4>
+                    <div class="table-container-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Gedung Mitra</th>
+                                    <th>Aksi Kontrol</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-master-gedung-body">
+                                </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TABEL APPROVAL & PLOTTING (Akses Pengesahan Pendaftar Baru) -->
-            <div id="block-plotting-karyawan" class="table-container-scroll">
-                <h4 class="form-admin-title title-warning"><i class="fa-solid fa-users-cog"></i> Konfirmasi & Approval Pendaftaran Pendaftar Baru</h4>
-                <table style="min-width: 450px;">
-                    <thead>
-                        <tr style="background: #f8f9fa;">
-                            <th>Nama / Email</th>
-                            <th>Request Jabatan & Gedung</th>
-                            <th>Status Akun</th>
-                            <th>Aksi Akses</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-approval-karyawan-body"></tbody>
-                </table>
+            <div class="form-admin-block" style="border-left: 4px solid var(--warning);">
+                <h4 class="form-admin-title" style="color:#d39e00;"><i class="fa-solid fa-folder-plus"></i> Distribusi Target Kerja Lapangan</h4>
+                <div class="flex-column-gap" style="margin-bottom: 10px;">
+                    <label style="font-size:11px; font-weight:bold; color:#555;">Pilih Gedung Sasaran:</label>
+                    <select id="input-area-pilih-gedung" class="input-compact"></select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <input type="text" id="input-nama-area-baru" class="input-compact" placeholder="Nama Area (cth: Lobby)">
+                        <button id="btn-submit-area-baru" class="btn-primary" style="padding:6px; font-size:11px; margin-top:5px;">+ Target Daily</button>
+                    </div>
+                    <div>
+                        <input type="text" id="input-nama-project-baru" class="input-compact" placeholder="Nama Project (cth: Kristalisasi)">
+                        <button id="btn-submit-project-baru" class="btn-success" style="padding:6px; font-size:11px; margin-top:5px;">+ Target Project</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- TABEL MONITORING UTAMA REAL-TIME -->
-            <h3 style="font-size: 14px; margin-top:15px; margin-bottom:5px;"><i class="fa-solid fa-square-poll-vertical"></i> Evaluasi Kebersihan Real-Time</h3>
-            <table>
-                <thead>
-                    <tr style="background: #f1f3f5;">
-                        <th>Waktu / Staff</th>
-                        <th>Nama Area Kerja</th>
-                        <th>Status</th>
-                        <th>Penilaian Admin</th>
-                    </tr>
-                </thead>
-                <tbody id="table-pantau-area-body"></tbody>
-            </table>
-            
-            <button id="btn-tutup-pantau-kerja" class="btn-danger" style="margin-top: 15px; padding: 6px;">Tutup Kontrol</button>
-        </div>
-    </div>
-</div>
+            <div class="form-admin-block border-info-block">
+                <h4 class="form-admin-title title-info"><i class="fa-solid fa-user-shield"></i> Validasi Anggota & Status Skuad</h4>
+                <div class="table-container-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Profil Skuad</th>
+                                <th>Jabatan & Gedung</th>
+                                <th>Status</th>
+                                <th>Aksi Kelola</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-approval-karyawan-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
 
-<script type="module" src="app.js"></script>
+            <div id="halaman-pantau-kerja-admin" class="pop-up-admin" style="display: none;">
+                <h3 style="margin-top: 0; font-size: 14px; color: var(--info);"><i class="fa-solid fa-wand-magic-sparkles"></i> Evaluasi Hasil Kebersihan Real-Time</h3>
+                <div class="table-container-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Oleh</th>
+                                <th>Nama Area / Gedung</th>
+                                <th>Status Lapangan</th>
+                                <th>Konfirmasi Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-pantau-area-body">
+                            </tbody>
+                    </table>
+                </div>
+                <button id="btn-tutup-pantau-kerja" class="btn-secondary" style="padding: 6px; font-size:12px; margin-top:10px;">Tutup Panel Monitor</button>
+            </div>
+
+            <div id="halaman-detail-absensi" class="pop-up-admin" style="display: none;">
+                <h3 style="margin-top:0; font-size:14px; color:var(--success);"><i class="fa-solid fa-clock-rotate-left"></i> Monitor Jam Absensi Skuad</h3>
+                <p style="font-size:11px; color:#666; margin-bottom:5px;">Gunakan modul ini untuk rekap sisa pembayaran atau verifikasi lapangan harian.</p>
+                <div class="table-container-scroll">
+                    <table style="width:100%; text-align:left;">
+                        <thead>
+                            <tr>
+                                <th>Nama Skuad</th>
+                                <th>Shift</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Pulang</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-rekap-absen-body">
+                            <tr><td colspan="4" style="text-align:center; color:#999;">Gunakan log global database utama.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button id="btn-tutup-absensi" class="btn-secondary" style="padding:6px; font-size:12px; margin-top:10px;">Tutup Panel Absen</button>
+            </div>
+
+        </section>
+
+    </div>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>
