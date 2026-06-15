@@ -4,13 +4,13 @@ import { getDatabase, ref, set, onValue, update, remove } from "https://www.gsta
 
 // CONFIG DATA FIREBASE KAMU
 const firebaseConfig = {
-    apiKey: "PASTE_API_KEY_KAMU",
-    authDomain: "PASTE_AUTH_DOMAIN_KAMU",
-    databaseURL: "PASTE_DATABASE_URL_KAMU",
-    projectId: "PASTE_PROJECT_ID_KAMU",
-    storageBucket: "PASTE_STORAGE_BUCKET_KAMU",
-    messagingSenderId: "PASTE_MESSAGING_SENDER_ID_KAMU",
-    appId: "PASTE_APP_ID_KAMU"
+  apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
+  authDomain: "clean-isabel-app-eaca6.firebaseapp.com",
+  databaseURL: "https://clean-isabel-app-eaca6-default-rtdb.firebaseio.com",
+  projectId: "clean-isabel-app-eaca6",
+  storageBucket: "clean-isabel-app-eaca6.firebasestorage.app",
+  messagingSenderId: "929083923327",
+  appId: "1:929083923327:web:3ebff1bbdd42eb3494984a"
 };
 
 const app = initializeApp(firebaseConfig);
