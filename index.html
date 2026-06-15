@@ -72,52 +72,108 @@
         </main>
 
         <section id="karyawan-section" style="display: none;">
-            <div class="menu-grid-compact">
-                <div class="menu-item-compact">
-                    <div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div>
-                    Tugas Rutin
-                </div>
-                <div class="menu-item-compact">
-                    <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    Lapor Isu
-                </div>
-                <div class="menu-item-compact">
-                    <div class="icon-wrapper-compact icon-staff"><i class="fa-solid fa-users"></i></div>
-                    Tim Kerja
-                </div>
-                <div class="menu-item-compact">
-                    <div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-boxes-stacked"></i></div>
-                    Stok Logistik
-                </div>
-                <div class="menu-item-compact">
-                    <div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div>
-                    Kirim Bukti
-                </div>
-                <div class="menu-item-compact">
-                    <div class="icon-wrapper-compact icon-absen"><i class="fa-solid fa-user-clock"></i></div>
-                    Riwayat
-                </div>
-            </div>
-
-            <div class="grid-absen-full">
-                <h3 style="margin-top: 0; font-size: 14px; color: #333;"><i class="fa-solid fa-fingerprint"></i> Absensi Digital Hari Ini</h3>
-                <select id="pilih-shift">
-                    <option value="Pagi">Shift Pagi</option>
-                    <option value="Middle">Shift Middle</option>
-                    <option value="Malam">Shift Malam</option>
-                </select>
-                <p id="absen-status" class="status-belum-absen">Belum Melakukan Absen Masuk</p>
-                <div class="btn-absen-container">
-                    <button id="btn-absen-masuk" class="btn-masuk"><i class="fa-solid fa-right-to-bracket"></i> Absen Masuk</button>
-                    <button id="btn-absen-pulang" class="btn-pulang" disabled><i class="fa-solid fa-right-from-bracket"></i> Absen Pulang</button>
-                </div>
-            </div>
-
-            <div class="grid-container-baru">
-                <h3 style="font-size: 14px; margin-bottom: 5px; color:#4e73df;"><i class="fa-solid fa-map-location-dot"></i> Monitoring Kerja Area Anda</h3>
-                <div id="grid-area-karyawan">
+            
+            <div id="karyawan-menu-grup">
+                <div class="grid-absen-full" style="margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; font-size: 14px; color: #333;"><i class="fa-solid fa-fingerprint"></i> Kartu Absensi Bulan Ini</h3>
+                    <div style="background: #e8f0fe; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                        <span style="font-size: 12px; color: #555;">Total Kehadiran Berjalan:</span>
+                        <h2 id="total-hari-kerja" style="margin: 5px 0 0 0; color: var(--primary);">0 Hari Kerja</h2>
                     </div>
+                    <p id="absen-status" class="status-belum-absen">Belum Melakukan Absen Masuk</p>
+                    <div class="btn-absen-container">
+                        <button id="btn-absen-masuk" class="btn-masuk"><i class="fa-solid fa-right-to-bracket"></i> Absen Masuk</button>
+                        <button id="btn-absen-pulang" class="btn-pulang" disabled><i class="fa-solid fa-right-from-bracket"></i> Absen Keluar</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="menu-item-compact" id="nav-tugas-rutin" style="padding: 20px 10px;">
+                        <div class="icon-wrapper-compact icon-tugas"><i class="fa-solid fa-list-check"></i></div>
+                        <b>Tugas Rutin</b>
+                    </div>
+                    <div class="menu-item-compact" id="nav-laporan-isu" style="padding: 20px 10px;">
+                        <div class="icon-wrapper-compact icon-isu"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <b>Laporan Isu</b>
+                    </div>
+                    <div class="menu-item-compact" id="nav-stok-chemical" style="padding: 20px 10px;">
+                        <div class="icon-wrapper-compact icon-stok"><i class="fa-solid fa-flask"></i></div>
+                        <b>Stok Chemical</b>
+                    </div>
+                    <div class="menu-item-compact" id="nav-kirim-bukti" style="padding: 20px 10px;">
+                        <div class="icon-wrapper-compact icon-bukti"><i class="fa-solid fa-camera"></i></div>
+                        <b>Kirim Bukti</b>
+                    </div>
+                </div>
             </div>
+
+            <div id="page-tugas-rutin" class="pop-up-admin" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:15px; color:var(--primary);"><i class="fa-solid fa-list-check"></i> Monitoring Pekerjaan</h3>
+                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                </div>
+                
+                <div class="form-admin-block" style="border-left:4px solid var(--danger); background:#fff5f5;">
+                    <h5 style="margin:0 0 8px 0; color:var(--danger); text-transform:uppercase;"><i class="fa-regular fa-clock"></i> Belum Dikerjakan</h5>
+                    <div id="box-belum-dikerjakan" class="grid-sub-pekerjaan"></div>
+                </div>
+
+                <div class="form-admin-block" style="border-left:4px solid var(--warning); background:#fffdf0;">
+                    <h5 style="margin:0 0 8px 0; color:#d39e00; text-transform:uppercase;"><i class="fa-solid fa-spinner fa-spin"></i> Menunggu Dicek Admin</h5>
+                    <div id="box-menunggu-cek" class="grid-sub-pekerjaan"></div>
+                </div>
+
+                <div class="form-admin-block" style="border-left:4px solid var(--success); background:#f0fff4;">
+                    <h5 style="margin:0 0 8px 0; color:var(--success); text-transform:uppercase;"><i class="fa-solid fa-square-check"></i> Sudah Bersih (Clean)</h5>
+                    <div id="box-selesai-bersih" class="grid-sub-pekerjaan"></div>
+                </div>
+
+                <div class="form-admin-block" style="border-left:4px solid #6e707e; background:#f4f5f7;">
+                    <h5 style="margin:0 0 8px 0; color:#3a3b45; text-transform:uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Kurang Bersih (Dirty)</h5>
+                    <div id="box-kurang-bersih" class="grid-sub-pekerjaan"></div>
+                </div>
+            </div>
+
+            <div id="page-laporan-isu" class="pop-up-admin" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:15px; color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Laporan Isu Gedung</h3>
+                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                </div>
+                <input type="text" id="isu-nama-lokasi" placeholder="Lokasi Spesifik (cth: Toilet Lantai 2)">
+                <textarea id="isu-deskripsi" placeholder="Deskripsikan kerusakan atau kendala lapangan..." style="width:100%; height:80px; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box; font-family:inherit; margin-bottom:10px;"></textarea>
+                <button id="btn-submit-isu" class="btn-danger">Kirim Laporan Kendala</button>
+            </div>
+
+            <div id="page-stok-chemical" class="pop-up-admin" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:15px; color:#d39e00;"><i class="fa-solid fa-flask"></i> Pemakaian Chemical</h3>
+                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                </div>
+                <div class="table-container-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Material</th>
+                                <th>Stok Gudang</th>
+                                <th>Aksi Request</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-chemical-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-kirim-bukti" class="pop-up-admin" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:15px; color:var(--success);"><i class="fa-solid fa-camera"></i> Kirim Bukti Dokumentasi</h3>
+                    <button class="btn-secondary btn-kembali" style="width:auto; padding:4px 10px; font-size:11px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                </div>
+                <p style="font-size:12px; color:#666;">Silakan tempel tautan foto/drive dokumentasi pekerjaan harian kamu di bawah ini:</p>
+                <input type="text" id="input-link-bukti" placeholder="https://link-foto-pekerjaan.com atau WhatsApp link">
+                <button id="btn-submit-bukti" class="btn-success">Kirim Link Dokumentasi</button>
+            </div>
+
         </section>
 
         <section id="admin-section" style="display: none;">
@@ -137,8 +193,8 @@
                 <div class="form-admin-block border-info-block">
                     <h4 class="form-admin-title title-info"><i class="fa-solid fa-square-plus"></i> Tambah Mitra Kawasan Gedung Baru</h4>
                     <div class="flex-column-gap">
-                        <input type="text" id="input-kawasan-utama" class="input-compact" placeholder="Contoh: Isabela, Clean_Solution">
-                        <input type="text" id="input-sub-tower" class="input-compact" placeholder="Contoh: Tower_A, Lantai_1">
+                        <input type="text" id="input-kawasan-utama" class="input-compact" placeholder="Contoh: Gedung_A, Gedung_B">
+                        <input type="text" id="input-sub-tower" class="input-compact" placeholder="Contoh: Tower_1, Lantai_Dasar">
                         <button id="btn-submit-gedung-baru" class="btn-info" style="padding:8px; font-size:12px;">Simpan Gedung Master</button>
                     </div>
                 </div>
@@ -153,8 +209,7 @@
                                     <th>Aksi Kontrol</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-master-gedung-body">
-                                </tbody>
+                            <tbody id="table-master-gedung-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -191,8 +246,7 @@
                                 <th>Aksi Kelola</th>
                             </tr>
                         </thead>
-                        <tbody id="table-approval-karyawan-body">
-                            </tbody>
+                        <tbody id="table-approval-karyawan-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -209,8 +263,7 @@
                                 <th>Konfirmasi Admin</th>
                             </tr>
                         </thead>
-                        <tbody id="table-pantau-area-body">
-                            </tbody>
+                        <tbody id="table-pantau-area-body"></tbody>
                     </table>
                 </div>
                 <button id="btn-tutup-pantau-kerja" class="btn-secondary" style="padding: 6px; font-size:12px; margin-top:10px;">Tutup Panel Monitor</button>
@@ -218,20 +271,17 @@
 
             <div id="halaman-detail-absensi" class="pop-up-admin" style="display: none;">
                 <h3 style="margin-top:0; font-size:14px; color:var(--success);"><i class="fa-solid fa-clock-rotate-left"></i> Monitor Jam Absensi Skuad</h3>
-                <p style="font-size:11px; color:#666; margin-bottom:5px;">Gunakan modul ini untuk rekap sisa pembayaran atau verifikasi lapangan harian.</p>
                 <div class="table-container-scroll">
                     <table style="width:100%; text-align:left;">
                         <thead>
                             <tr>
                                 <th>Nama Skuad</th>
+                                <th>Asal Gedung</th>
                                 <th>Shift</th>
-                                <th>Jam Masuk</th>
-                                <th>Jam Pulang</th>
+                                <th>Jam Masuk / Keluar</th>
                             </tr>
                         </thead>
-                        <tbody id="table-rekap-absen-body">
-                            <tr><td colspan="4" style="text-align:center; color:#999;">Gunakan log global database utama.</td></tr>
-                        </tbody>
+                        <tbody id="table-rekap-absen-body"></tbody>
                     </table>
                 </div>
                 <button id="btn-tutup-absensi" class="btn-secondary" style="padding:6px; font-size:12px; margin-top:10px;">Tutup Panel Absen</button>
