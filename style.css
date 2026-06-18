@@ -53,6 +53,9 @@ body {
     font-weight: bold;
 }
 
+/* ================================================================= */
+/* FORM LOGIN & SHIELD CARD (Aman 100% Sesuai Foto Nomor 2 Kesukaan Lu) */
+/* ================================================================= */
 .login-card { text-align: center; padding: 30px 10px 10px 10px; }
 .shield-icon-wrapper {
     width: 70px; height: 70px; background: var(--primary); color: white;
@@ -78,6 +81,9 @@ body {
 .form-daftar { display: none; background: #f8f9fc; border: 1px solid #e3e6f0; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: left; }
 .form-daftar input, .form-daftar select { padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; }
 
+/* ================================================================= */
+/* PANEL KARYAWAN & ABSENSI (Unyil & Rapi) */
+/* ================================================================= */
 .grid-absen-full { background: #ffffff; border: 1px solid #e3e6f0; border-radius: 12px; padding: 15px; text-align: center; }
 .btn-absen-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn-masuk, .btn-pulang { border: none; padding: 12px 10px; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 13px; }
@@ -102,6 +108,9 @@ body {
 .grid-sub-pekerjaan { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
 .btn-kembali { background: var(--dark); color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
 
+/* ================================================================= */
+/* PANEL OPERASIONAL ADMIN (Aman Terkendali) */
+/* ================================================================= */
 .menu-grid-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 .form-admin-block { background: #ffffff; border: 1px solid #e3e6f0; border-radius: 8px; padding: 12px; margin-bottom: 15px; }
 .border-info-block { border-left: 4px solid var(--info); }
@@ -121,6 +130,9 @@ th { background: #f8f9fc; color: #4e73df; font-weight: 700; }
 }
 .img-bukti-kamera-render:hover { transform: scale(1.1); }
 
+/* ================================================================= */
+/* KOMPONEN TOMBOL UTAMA & BADGE SYSTEMS */
+/* ================================================================= */
 .btn-primary { background: var(--primary); color: white; }
 .btn-success { background: var(--success); color: white; }
 .btn-info { background: var(--info); color: white; }
