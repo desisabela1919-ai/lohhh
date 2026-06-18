@@ -61,7 +61,7 @@ export function aktifkanFiturAdmin() {
                         <td>
                             <div style="display:flex; gap:4px;">
                                 <button style="background:var(--success); color:white; padding:4px 6px; font-size:11px; border-radius:4px; width:auto; border:none; cursor:pointer;" onclick="adminApproveKerja('${userGedungKunci}', '${todayStr}', '${idKerja}')">Lulus Cek</button>
-                                <button style="background:var(--danger); color:white; padding:4px 6px; font-size:11px; border-radius:4px; width:auto; border:none; cursor:pointer;" onclick="adminTolakKerja('${userGedungKunci}', '${todayStr}', '${idKerja}')">Koreksi</button>
+                                <button style="background:var(--danger); color:white; padding:4px 6px; font-size:11px; border-radius:4px; width:auto; border:none; cursor:pointer;" onclick="adminTolakKerja('${userGedungKunci}', '${todayStr}', '--Koreksi--')">Koreksi</button>
                             </div>
                         </td>
                     `;
@@ -75,7 +75,7 @@ export function aktifkanFiturAdmin() {
         }
     });
 
-    // AMBIL KARYAWAN AKTIF UNTUK DROPDOWN PENUGASAN (BAGIAN YANG TERPOTONG)
+    // AMBIL KARYAWAN AKTIF UNTUK DROPDOWN PENUGASAN
     onValue(ref(db, 'users_profile'), (snapshot) => {
         const users = snapshot.val() || {};
         const selectSkuad = document.getElementById('input-target-nama-skuad');
@@ -91,6 +91,60 @@ export function aktifkanFiturAdmin() {
             }
         }
     });
+
+    // INTERSEPSI ENGINE: TOMBOL KIRIM TUGAS RESMI (ADMIN KE KARYAWAN)
+    const btnSubmitTugas = document.getElementById('btn-submit-area-baru-v2');
+    if (btnSubmitTugas) {
+        btnSubmitTugas.onclick = function() {
+            const areaPilih = document.getElementById('input-area-pilih-gedung') ? document.getElementById('input-area-pilih-gedung').value : userGedungKunci;
+            const namaAreaSpesifik = document.getElementById('input-nama-area-spesifik') ? document.getElementById('input-nama-area-spesifik').value.trim() : "";
+            const skuadTarget = document.getElementById('input-target-nama-skuad') ? document.getElementById('input-target-nama-skuad').value : "";
+            const shiftKerja = document.getElementById('input-shift-kerja-tugas') ? document.getElementById('input-shift-kerja-tugas').value : "Shift 1";
+            const detailJobText = document.getElementById('input-rincian-tugas-checklist') ? document.getElementById('input-rincian-tugas-checklist').value.trim() : "";
+
+            if (!namaAreaSpesifik || !skuadTarget || !detailJobText) {
+                alert("Gagal Kirim! Nama Area, Skuad Pelaksana, & Rincian Tugas wajib diisi!");
+                return;
+            }
+
+            const idTugas = `task_${Date.now()}`;
+            set(ref(db, `monitoring_area/${areaPilih}/${todayStr}/${idTugas}`), {
+                id: idTugas,
+                area: namaAreaSpesifik,
+                skuadTarget: skuadTarget,
+                shiftKerja: shiftKerja,
+                detailJob: detailJobText,
+                status: "Belum Dikerjakan",
+                kategori: "Rutin",
+                catatan: "-",
+                fotoBukti: "-",
+                jamLapor: "-"
+            }).then(() => {
+                alert(`Tugas sukses dikirim ke ${skuadTarget}! Karyawan bisa langsung cek aplikasi.`);
+                if(document.getElementById('input-nama-area-spesifik')) document.getElementById('input-nama-area-spesifik').value = "";
+                if(document.getElementById('input-rincian-tugas-checklist')) document.getElementById('input-rincian-tugas-checklist').value = "";
+            }).catch((err) => alert("Firebase Error: " + err.message));
+        };
+    }
+
+    // INTERSEPSI ENGINE: TOMBOL TAMBAH MASTER KONTRAK GEDUNG BARU (ADMIN PUSAT ONLY)
+    const btnTambahGedung = document.getElementById('btn-submit-gedung-master');
+    if (btnTambahGedung) {
+        btnTambahGedung.onclick = function() {
+            const namaGedungBaru = document.getElementById('input-nama-gedung-master') ? document.getElementById('input-nama-gedung-master').value.trim() : "";
+            if (!namaGedungBaru) { alert("Masukkan nama gedung terlebih dahulu!"); return; }
+            
+            // Format ID Firebase: hilangkan spasi/ganti karakter ilegal
+            const idGedungFormat = namaGedungBaru.replace(/\s+/g, '_-_');
+            set(ref(db, `daftar_gedung/${idGedungFormat}`), {
+                namaGedung: namaGedungBaru,
+                tglKontrak: new Date().toLocaleDateString('id-ID')
+            }).then(() => {
+                alert("Gedung Kontrak Baru Berhasil Terdaftar!");
+                if(document.getElementById('input-nama-gedung-master')) document.getElementById('input-nama-gedung-master').value = "";
+            });
+        };
+    }
 }
 
 // ================================================================= */
