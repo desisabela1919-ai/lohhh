@@ -61,6 +61,33 @@ label {
     color: #475569;
 }
 
+/* STYLE BARU: UNTUK CONTAINER MULTI-CHECKLIST ADMIN (NO 5) */
+.checklist-item-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 5px;
+    border-bottom: 1px idotted #e2e8f0;
+    cursor: pointer;
+}
+
+.checklist-item-box:last-child {
+    border-bottom: none;
+}
+
+.checklist-item-box input[type="checkbox"] {
+    width: auto;
+    margin-bottom: 0;
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.checklist-item-box span {
+    font-size: 13px;
+    color: #334155;
+    font-weight: 500;
+}
+
 /* BUTTONS SYSTEM */
 button { 
     width: 100%; 
