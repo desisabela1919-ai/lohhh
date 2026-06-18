@@ -288,11 +288,11 @@ function aktifkanFiturKaryawan() {
 
     if(document.getElementById('btn-sos-karyawan')) {
         document.getElementById('btn-sos-karyawan').onclick = () => {
-            if(confirm("Kirim Sinyal SOS Darurat ke Ruang Pengawas?")) {
+            if(confirm("Kirim Sinyal SOS Darurat ke Ruang Pengawas Gedung Ini?")) {
                 const idSos = `sos_${Date.now()}`;
                 set(ref(db, `laporan_emergency/${userGedungKunci}/${idSos}`), {
                     oleh: userNamaKunci, gedung: userGedungKunci, waktu: new Date().toLocaleTimeString('id-ID'), status: "CRITICAL"
-                }).then(() => alert("Sinyal SOS Disebarkan!"));
+                }).then(() => alert("Sinyal SOS Disebarkan ke Pengawas Gedung!"));
             }
         };
     }
@@ -449,7 +449,7 @@ function aktifkanFiturAdmin() {
     else document.getElementById('block-admin-pusat-only').style.display = 'none';
 
     document.getElementById('menu-pantau-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'block';
-    document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.none;
+    document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'none';
     document.getElementById('menu-admin-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'block';
     document.getElementById('btn-tutup-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'none';
     
@@ -460,7 +460,7 @@ function aktifkanFiturAdmin() {
         document.getElementById('btn-tutup-pantau-isu').onclick = () => document.getElementById('halaman-pantau-isu-admin').style.display = 'none';
     }
 
-    // AMBIL KARYAWAN AKTIF UNTUK DROPDOWN INPUT TUGAS AUTOMATIS
+    // AMBIL KARYAWAN AKTIF UNTUK DROPDOWN INPUT TUGAS AUTOMATIS (SCOPED)
     onValue(ref(db, 'users_profile'), (snapshot) => {
         const users = snapshot.val() || {};
         const selectSkuad = document.getElementById('input-target-nama-skuad');
@@ -474,6 +474,59 @@ function aktifkanFiturAdmin() {
             }
         }
     });
+
+    // LOGIC CHECKLIST DAFTAR TUGAS DINAMIS (NO 5)
+    const selectArea = document.getElementById('select-area-template');
+    if(selectArea) {
+        selectArea.onchange = () => {
+            const areaDipilih = selectArea.value;
+            const containerChecklist = document.getElementById('container-checklist-job-step');
+            const textareaDetailJob = document.getElementById('input-detail-job-step');
+            
+            if(containerChecklist && textareaDetailJob) {
+                containerChecklist.innerHTML = "";
+                textareaDetailJob.value = "";
+
+                // Master SOP Step Berdasarkan Area Pilihan
+                const masterSOP = {
+                    "Lobby Utama": ["Sweeping & Mopping Lantai", "Cleaning Kaca Pintu Utama", "Sanitasi Handle Pintu", "Dusting Meja Resepsionis", "Empty Trash Bin"],
+                    "Toilet Pria": ["Cleaning Urinal & Kloset", "Mopping Lantai Disinfektan", "Pembersihan Wastafel & Cermin", "Refill Sabun & Tissue", "Empty Trash Bin"],
+                    "Toilet Wanita": ["Cleaning Kloset Duduk", "Mopping Lantai Disinfektan", "Pembersihan Wastafel & Cermin", "Refill Sabun & Tissue", "Empty Trash Bin"],
+                    "Ruang Kantor / Kerja": ["Dusting Meja Kerja & Kursi", "Sweeping & Mopping Lantai", "Empty Trash Bin Sisi Karyawan", "Vacuum Karpet (Jika Ada)"],
+                    "Tangga Darurat & Koridor": ["Sweeping & Mopping Lantai Koridor", "Dusting Handrail Tangga", "Pembersihan Plafon dari Sarang Laba-Laba"],
+                    "Area Parkir / Outdoor": ["Sweeping Daun Kering / Sampah", "Empty Trash Bin Outdoor", "Pembersihan Jalur Drainase Depan"]
+                };
+
+                if(masterSOP[areaDipilih]) {
+                    masterSOP[areaDipilih].forEach(step => {
+                        const div = document.createElement('div');
+                        div.className = "checklist-item-box";
+                        div.innerHTML = `
+                            <input type="checkbox" value="${step}" checked>
+                            <span>${step}</span>
+                        `;
+                        
+                        // Pas dicentang / lepas centang, update string textarea
+                        const chk = div.querySelector('input');
+                        chk.onchange = () => kalkulasiStringChecklist();
+                        
+                        containerChecklist.appendChild(div);
+                    });
+                    kalkulasiStringChecklist();
+                }
+            }
+        };
+    }
+
+    function kalkulasiStringChecklist() {
+        const checkboxes = document.querySelectorAll('#container-checklist-job-step input[type="checkbox"]');
+        const textareaDetailJob = document.getElementById('input-detail-job-step');
+        let arrHasil = [];
+        checkboxes.forEach(cb => {
+            if(cb.checked) arrHasil.push(cb.value);
+        });
+        if(textareaDetailJob) textareaDetailJob.value = arrHasil.join(', ');
+    }
 
     document.getElementById('btn-submit-gedung-baru').onclick = () => {
         const kw = document.getElementById('input-kawasan-utama').value.trim();
@@ -493,13 +546,13 @@ function aktifkanFiturAdmin() {
     document.getElementById('btn-submit-area-baru').onclick = () => {
         const gd = document.getElementById('input-area-pilih-gedung').value;
         const targetSkuad = document.getElementById('input-target-nama-skuad').value;
-        const selectArea = document.getElementById('select-area-template').value;
+        const selectAreaVal = document.getElementById('select-area-template').value;
         const customArea = document.getElementById('input-nama-area-baru').value.trim();
         const kat = document.getElementById('input-jenis-tugas-kategori').value; 
         const shiftDipilih = document.getElementById('input-shift-tugas-admin').value; 
         const txtDetailJob = document.getElementById('input-detail-job-step').value.trim(); 
 
-        const namaAreaFinal = customArea || selectArea;
+        const namaAreaFinal = customArea || selectAreaVal;
 
         if(!targetSkuad || !namaAreaFinal) { alert("Pilih Skuad & Tentukan Area Tugas!"); return; }
         
@@ -509,6 +562,10 @@ function aktifkanFiturAdmin() {
         alert("Instruksi Tugas Resmi Berhasil Dikirim!");
         document.getElementById('input-nama-area-baru').value = "";
         if(document.getElementById('input-detail-job-step')) document.getElementById('input-detail-job-step').value = "";
+        
+        // Reset checklist visual
+        const containerChecklist = document.getElementById('container-checklist-job-step');
+        if(containerChecklist) containerChecklist.innerHTML = "";
     };
 
     window.downloadFotoBukti = function(base64Data, namaFile) {
@@ -567,73 +624,14 @@ function aktifkanFiturAdmin() {
                         <td style="text-align:center;">${tagFotoKerja}<br>${btnDownload}</td>
                         <td>
                             <div style="display:flex; flex-direction:column; gap:4px;">
-                                <button style="background:green; color:white; font-size:10px; padding:4px; border:none; border-radius:3px;" onclick="evalPekerjaanLuar('${gd}','${id}','Area Resmi Bersih')">Bersih</button>
-                                <button style="background:red; color:white; font-size:10px; padding:4px; border:none; border-radius:3px;" onclick="evalPekerjaanLuar('${gd}','${id}','Kurang Bersih')">Koreksi</button>
+                                <button style="background:var(--success); color:white; font-size:11px; padding:4px; border:none; border-radius:4px; font-weight:600;" onclick="evalPekerjaanLuar('${gd}','${id}','Area Resmi Bersih')">Lulus Cek</button>
+                                <button style="background:var(--danger); color:white; font-size:11px; padding:4px; border:none; border-radius:4px; font-weight:600;" onclick="evalPekerjaanLuar('${gd}','${id}','Kurang Bersih')">Koreksi</button>
                             </div>
                         </td>
                     `;
                     tbodyEval.appendChild(tr);
                 }
             });
-        }
-    });
-
-    onValue(ref(db, `laporan_emergency`), (snap) => {
-        const rootSos = snap.val() || {};
-        for(let gd in rootSos){
-            if(userRoleKunci === "Admin Gedung" && gd !== userGedungKunci) continue;
-            for(let id in rootSos[gd]){
-                if(rootSos[gd][id].status === "CRITICAL") {
-                    alert(`🚨 ALARM EMERGENCY SYSTEM 🚨\n\nSkuad Lapangan ${rootSos[gd][id].oleh} memicu tombol SOS di area Gedung ${gd.replace(/_-_/g,' ')}!`);
-                    update(ref(db, `laporan_emergency/${gd}/${id}`), { status: "HANDLED" });
-                }
-            }
-        }
-    });
-
-    onValue(ref(db, 'log_chemical_global'), (snap) => {
-        const data = snap.val() || {};
-        const tbody = document.getElementById('table-admin-chemical-log-body'); if(tbody) tbody.innerHTML = "";
-        for(let id in data) {
-            if(userRoleKunci === "Admin Gedung" && data[id].gedung !== userGedungKunci) continue;
-            if(tbody) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${data[id].waktu}</td><td><b>${data[id].namaSkuad}</b></td><td>${data[id].chemical}</td><td><span style="color:var(--danger); font-weight:bold;">${data[id].volume}</span></td>`;
-                tbody.appendChild(tr);
-            }
-        }
-    });
-
-    // LINK KODE MONITORING ABSENSI GLOBAL YANG TERPOTONG
-    onValue(ref(db, 'absensi_global'), (snapshotGedungAbsen) => {
-        const rootAbsen = snapshotGedungAbsen.val() || {};
-        const tbodyAbsen = document.getElementById('table-rekap-absensi-admin-body'); 
-        if(tbodyAbsen) tbodyAbsen.innerHTML = "";
-
-        for (let gdId in rootAbsen) {
-            if (userRoleKunci === "Admin Gedung" && gdId !== userGedungKunci) continue;
-            
-            if (rootAbsen[gdId][currentMonthStr] && rootAbsen[gdId][currentMonthStr][todayStr]) {
-                const dataHariIni = rootAbsen[gdId][currentMonthStr][todayStr];
-                
-                for (let uid in dataHariIni) {
-                    const log = dataHariIni[uid];
-                    const tr = document.createElement('tr');
-                    
-                    let viewSelfie = '<span style="color:#aaa;">No Photo</span>';
-                    if(log.fotoMasuk) {
-                        viewSelfie = `<img src="${log.fotoMasuk}" style="width:50px; height:50px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="window.open('${log.fotoMasuk}','_blank')">`;
-                    }
-                    
-                    tr.innerHTML = `
-                        <td><b>${log.nama || 'Skuad'}</b><br><small style="color:#666;">${gdId.replace(/_-_/g, ' ')}</small></td>
-                        <td><small style="font-size:11px;">${log.masukLog || '-'}</small></td>
-                        <td><small style="font-size:11px; color:green; font-weight:bold;">${log.pulangLog || 'Sedang Bekerja'}</small></td>
-                        <td style="text-align:center;">${viewSelfie}</td>
-                    `;
-                    if(tbodyAbsen) tbodyAbsen.appendChild(tr);
-                }
-            }
         }
     });
 }
@@ -643,27 +641,20 @@ function renderBukuRekapIsuAdmin() {
     const currentMonthStr = todayStr.substring(0, 7);
     
     onValue(ref(db, `laporan_isu_global/${currentMonthStr}`), (snapshot) => {
-        const data = snapshot.val() || {};
-        const tbody = document.getElementById('table-rekap-isu-admin-body');
-        if(tbody) {
-            tbody.innerHTML = "";
-            for(let id in data) {
-                if(userRoleKunci === "Admin Gedung" && data[id].gedung !== userGedungKunci) continue;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><small>${data[id].waktu}</small><br><b>${data[id].pelapor}</b></td>
-                    <td><span style="color:purple; font-weight:bold;">${data[id].gedung.replace(/_-_/g, ' ')}</span><br>${data[id].lokasiSpesifik}</td>
-                    <td><p style="margin:0; color:#dc2626; font-weight:500;">${data[id].deskripsi}</p></td>
-                `;
-                tbody.appendChild(tr);
-            }
+        const dataIsu = snapshot.val() || {};
+        const tbodyIsu = document.getElementById('table-pantau-isu-body'); if(tbodyIsu) tbodyIsu.innerHTML = "";
+
+        for(let id in dataIsu) {
+            const item = dataIsu[id];
+            if(userRoleKunci === "Admin Gedung" && item.gedung !== userGedungKunci) continue;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><small>${item.waktu}</small><br><b>${item.gedung.replace(/_-_/g, ' ')}</b></td>
+                <td><b>${item.pelapor}</b><br><small>Lokasi: ${item.lokasiSpesifik}</small></td>
+                <td><p style="margin:0; font-size:11px; color:#475569;">${item.deskripsi}</p></td>
+            `;
+            if(tbodyIsu) tbodyIsu.appendChild(tr);
         }
     });
-}
-
-// FORMAT EXCEL SPREADSHEET / PRINT REKAP KERJA HARI INI
-if(document.getElementById('btn-export-excel-kerja')) {
-    document.getElementById('btn-export-excel-kerja').onclick = () => {
-        window.print();
-    };
 }
