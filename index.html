@@ -13,10 +13,15 @@
     <div class="container">
 
         <section id="login-page">
-            <div class="card-auth">
-                <h2 class="auth-title"><i class="fa-solid fa-shield-alt"></i> Smart Clean Hub</h2>
-                <div id="login-error" class="error-msg"></div>
-                <form id="login-form">
+            <div class="card-auth" style="text-align: center;">
+                <div class="brand-wrapper" style="margin-bottom: 20px;">
+                    <i class="fa-solid fa-shield-alt" style="font-size: 45px; color: #1a73e8; margin-bottom: 10px; display: block;"></i>
+                    <h2 class="auth-title" style="margin: 0; font-weight: 700; color: #1a73e8;">Smart Clean Hub</h2>
+                </div>
+                
+                <div id="login-error" class="error-msg" style="display: none; background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;"></div>
+                
+                <form id="login-form" style="text-align: left;">
                     <label>Email Akses</label>
                     <input type="email" id="login-email" placeholder="contoh@smartcleanhub.com" required>
                     <label>Kata Sandi</label>
@@ -33,7 +38,7 @@
                 <input type="text" id="reg-nama" placeholder="Nama Lengkap Skuad">
                 <input type="email" id="reg-email" placeholder="Email Baru">
                 <input type="password" id="reg-password" placeholder="Password (Min 6 Karakter)">
-                
+                 
                 <label>Pilihan Jabatan Operasional</label>
                 <select id="reg-role">
                     <option value="Karyawan">Karyawan Lapangan</option>
@@ -42,7 +47,7 @@
 
                 <label>Penempatan Kontrak Utama</label>
                 <select id="reg-lokasi">
-                    </select>
+                </select>
 
                 <button id="btn-submit-daftar" class="btn-success">Kirim Data Registrasi</button>
                 <button id="btn-batal-daftar" class="btn-danger" style="margin-top: 5px;">Batal</button>
@@ -64,7 +69,7 @@
         </header>
 
         <section id="karyawan-section" style="display: none;">
-            
+             
             <div id="kartu-presisi-absensi-box" style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); margin-bottom: 15px;">
                 <h4 style="font-size: 13px; margin-bottom: 8px;"><i class="fa-solid fa-fingerprint"></i> Kartu Presisi Absensi Digital</h4>
                 <p style="font-size: 12px; margin-bottom: 10px;">Status Hari Ini: <span id="absen-status" class="status-belum-absen">Mengecek Data...</span></p>
@@ -126,19 +131,16 @@
             <div id="page-panduan-digital" class="section-page">
                 <h3 class="page-title">📚 Dokumen Regulasi SOP, RKB, & RKT</h3>
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
-                    
                     <a href="LENGKAPI_LINK_SPREADSHEET_SOP_DISINI" target="_blank" class="btn-primary" style="text-align: center; text-decoration: none; padding: 15px; font-size: 14px; background: #0284c7;">
                         <i class="fa-solid fa-file-shield"></i> Buka Link Dokumen SOP
                     </a>
-                    
                     <a href="LENGKAPI_LINK_SPREADSHEET_RKB_DISINI" target="_blank" class="btn-success" style="text-align: center; text-decoration: none; padding: 15px; font-size: 14px; background: #16a34a;">
                         <i class="fa-solid fa-calendar-check"></i> Buka Link RKB (Bulanan)
                     </a>
-                    
                     <a href="LENGKAPI_LINK_SPREADSHEET_RKT_DISINI" target="_blank" class="btn-warning" style="text-align: center; text-decoration: none; padding: 15px; font-size: 14px; background: #ea580c; color: white;">
                         <i class="fa-solid fa-chart-line"></i> Buka Link RKT (Tahunan)
                     </a>
-                    </div>
+                </div>
                 <button class="btn-kembali" style="margin-top: 25px;">Kembali ke Menu</button>
             </div>
 
@@ -217,12 +219,12 @@
                 <h4 style="font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;"><i class="fa-solid fa-paper-plane"></i> Dispatching Instruksi Tugas</h4>
                 
                 <label>Gedung Penugasan</label>
-                <select id="input-area-pilih-ged></select>
+                <select id="input-area-pilih-gedung"></select>
 
                 <label>Nama Skuad Lapangan</label>
                 <select id="input-target-nama-skuad-select">
                     <option value="">-- Pilih Skuad Lapangan --</option>
-                    </select>
+                </select>
 
                 <label>Nama / Zona Area Kerja</label>
                 <select id="input-nama-area-baru-select">
@@ -250,15 +252,10 @@
                     <option value="Extra">Extra Job Request</option>
                 </select>
 
-                <label>Rincian Langkah Tugas / Detail Checklist</label>
-                <select id="input-detail-job-step-select">
-                    <option value="">-- Pilih Detail Pekerjaan Pokok --</option>
-                    <option value="Cleaning Tangga, Lap Handrail, Sweeping, Mopping">Cleaning Tangga (Sapu, Pel, Lap Handrail)</option>
-                    <option value="Cleaning Lobby, Dusting Furniture, Glass Cleaning, Mopping">Cleaning Lobby (Lap Kaca, Pel, Dusting)</option>
-                    <option value="Cleaning Toilet, Sikat Lantai, Lap Cermin, Isi Ulang Handsoap, Buang Sampah">Cleaning Toilet Lengkap</option>
-                    <option value="Sweeping Area, Mopping Area, Dusting Ornamen">Sapu + Pel + Lap Ringan Standard</option>
-                    <option value="Glass Cleaning, Tarikan Squeegee Satu Arah">Pembersihan Kaca Spesifik</option>
-                </select>
+                <label>Rincian Langkah Tugas / Detail Checklist (Bisa Pilih Banyak)</label>
+                <div id="container-multi-checklist" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 15px;">
+                    <p style="color: #64748b; font-size: 12px; margin: 0;">Silakan pilih "Nama / Zona Area Kerja" terlebih dahulu...</p>
+                </div>
 
                 <div id="extra-job-input-box" style="margin-top: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
                     <label style="color: #be185d;"><i class="fa-solid fa-circle-plus"></i> Input Deskripsi Extra Job Manual (Optional Admin)</label>
