@@ -253,7 +253,7 @@ function aktifkanFiturKaryawan() {
             if(stateLabel) { stateLabel.className = "status-sudah-pulang"; stateLabel.textContent = `Shift Selesai (Sudah Absen Pulang)`; }
             if(btnMasuk) btnMasuk.disabled = true; 
             if(btnPulang) btnPulang.disabled = true;
-        } else if (sudntukMasuk) {
+        } else if (sudahAbsenMasuk) {
             const sekarangMili = Date.now();
             const selisihJam = (sekarangMili - waktuAbsenMasukMili) / (1000 * 60 * 60);
 
