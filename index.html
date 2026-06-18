@@ -243,43 +243,28 @@
                 <label>Nama Skuad Lapangan</label>
                 <select id="input-target-nama-skuad-select">
                     <option value="">-- Pilih Skuad Lapangan --</option>
-                </select>
+                    </select>
 
                 <label>Nama / Zona Area Kerja</label>
-                <select id="input-nama-area-baru-select">
-                    <option value="">-- Pilih Area Kerja --</option>
-                    <option value="MZ">MZ (Mezzanine)</option>
-                    <option value="Lobby Utama">Lobby Utama</option>
-                    <option value="Toilet Lt.1">Toilet Lantai 1</option>
-                    <option value="Toilet Lt.2">Toilet Lantai 2</option>
-                    <option value="Area Parkir Depan">Area Parkir Depan</option>
-                    <option value="Tangga Darurat">Tangga Darurat</option>
-                </select>
+                <input type="text" id="input-nama-area-manual" placeholder="Contoh: Toilet Lt.2, Koridor Barat, Lobby Lift Utama" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; box-sizing: border-box; margin-top: 5px; margin-bottom: 10px;">
 
                 <label>Shift Kerja Penugasan</label>
-                <select id="input-shift-tugas-admin">
+                <select id="input-shift-tugas-admin-v2">
                     <option value="Shift 1">Shift 1 (Pagi)</option>
                     <option value="Shift 2">Shift 2 (Siang)</option>
                     <option value="Shift 3">Shift 3 (Malam)</option>
-                    <option value="Shift 4">Shift 4 (Kondisional)</option>
-                    <option value="Shift 5">Shift 5 (Lembur Extra)</option>
                 </select>
 
                 <label>Kategori Jenis Tugas</label>
-                <select id="input-jenis-tugas-kategori">
+                <select id="input-jenis-tugas-kategori-v2">
                     <option value="Rutin">Rutin Harian</option>
-                    <option value="Extra">Extra Job Request</option>
+                    <option value="Extra">Extra Job / Insidental</option>
                 </select>
 
                 <label style="font-weight: bold;">Rincian Langkah Tugas / Detail Checklist (Pisahkan dengan Tanda Koma)</label>
-                <textarea id="input-detail-checklist-manual" rows="4" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; font-family: inherit; margin-top: 5px; margin-bottom: 10px;" placeholder="Contoh: Sapu lantai, Pel lantai MZ, Lap meja, Bersihkan saringan AC, Buang sampah"></textarea>
+                <textarea id="input-detail-checklist-manual" rows="4" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; font-family: inherit; margin-top: 5px; margin-bottom: 10px;" placeholder="Contoh: Sapu lantai, Pel lantai, Lap kaca railing, Buang sampah"></textarea>
 
-                <div id="extra-job-input-box" style="margin-top: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    <label style="color: #be185d;"><i class="fa-solid fa-circle-plus"></i> Input Deskripsi Extra Job Manual (Optional Admin)</label>
-                    <input type="text" id="input-detail-extra-job-manual" placeholder="Contoh: Poles bercak lantai lift, Vacuum karpet direksi">
-                </div>
-
-                <button id="btn-submit-area-baru" class="btn-success" style="margin-top: 15px;">Kirim Tugas Resmi</button>
+                <button id="btn-submit-area-baru-v2" class="btn-success" style="margin-top: 15px; width: 100%;">Kirim Tugas Resmi</button>
             </div>
 
             <div style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); margin-bottom: 15px;">
