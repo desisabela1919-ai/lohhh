@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // ================================================================= */
-// CONFIGURASI DATABASE FIREBASE CLEAN ISABEL APP
+// KONFIGURASI DATABASE FIREBASE CLEAN ISABEL APP
 // ================================================================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBnXFEJjTovKQUGs74ZcziZ6odR6qxYeug",
@@ -113,6 +113,13 @@ if(btnLogout) {
     btnLogout.addEventListener('click', () => { signOut(auth); });
 }
 
+// Global window function untuk hapus data gedung master
+window.hapusGedungMaster = function(idGedung) {
+    if(confirm(`Hapus kontrak gedung ${idGedung.replace(/_-_/g, ' ')}? Semua data monitoring area ini akan terhapus.`)) {
+        remove(ref(db, `daftar_gedung/${idGedung}`)).then(() => alert("Gedung sukses dihapus dari sistem."));
+    }
+}
+
 // ================================================================= */
 // MONITORING STATUS LOGIN USER & SUNTIK INFO HEADER BARU
 // ================================================================= */
@@ -173,7 +180,7 @@ function resetHalamanKaryawan() {
 }
 
 // ================================================================= */
-// MODUL KARYAWAN: ABSENSI HILANG AUTOMATIS 8 JAM & KAN KODE GALERI
+// MODUL KARYAWAN: ABSENSI DENGAN TIMING DAN KAMERA HP
 // ================================================================= */
 function aktifkanFiturKaryawan() {
     const d = new Date();
@@ -442,11 +449,31 @@ function aktifkanFiturAdmin() {
     else document.getElementById('block-admin-pusat-only').style.display = 'none';
 
     document.getElementById('menu-pantau-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'block';
-    document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.display = 'none';
+    document.getElementById('btn-tutup-absensi').onclick = () => document.getElementById('halaman-detail-absensi').style.none;
     document.getElementById('menu-admin-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'block';
     document.getElementById('btn-tutup-pantau-kerja').onclick = () => document.getElementById('halaman-pantau-kerja-admin').style.display = 'none';
-    document.getElementById('menu-admin-rekap-isu').onclick = () => { document.getElementById('halaman-pantau-isu-admin').style.display = 'block'; renderBukuRekapIsuAdmin(); };
-    document.getElementById('btn-tutup-pantau-isu').onclick = () => document.getElementById('halaman-pantau-isu-admin').style.display = 'none';
+    
+    if(document.getElementById('menu-admin-rekap-isu')) {
+        document.getElementById('menu-admin-rekap-isu').onclick = () => { document.getElementById('halaman-pantau-isu-admin').style.display = 'block'; renderBukuRekapIsuAdmin(); };
+    }
+    if(document.getElementById('btn-tutup-pantau-isu')) {
+        document.getElementById('btn-tutup-pantau-isu').onclick = () => document.getElementById('halaman-pantau-isu-admin').style.display = 'none';
+    }
+
+    // AMBIL KARYAWAN AKTIF UNTUK DROPDOWN INPUT TUGAS AUTOMATIS
+    onValue(ref(db, 'users_profile'), (snapshot) => {
+        const users = snapshot.val() || {};
+        const selectSkuad = document.getElementById('input-target-nama-skuad');
+        if(selectSkuad) {
+            selectSkuad.innerHTML = '<option value="">-- Pilih Skuad Lapangan --</option>';
+            for(let uid in users) {
+                if(users[uid].role === "Karyawan" && users[uid].status === "Aktif") {
+                    if(userRoleKunci === "Admin Gedung" && users[uid].gedung !== userGedungKunci) continue;
+                    selectSkuad.innerHTML += `<option value="${users[uid].nama}">${users[uid].nama} (${users[uid].shift})</option>`;
+                }
+            }
+        }
+    });
 
     document.getElementById('btn-submit-gedung-baru').onclick = () => {
         const kw = document.getElementById('input-kawasan-utama').value.trim();
@@ -454,6 +481,8 @@ function aktifkanFiturAdmin() {
         if(!kw || !tw) return;
         set(ref(db, `daftar_gedung/${kw}_-_${tw}`), { kawasan: kw, tower: tw });
         alert("Master data area kontrak gedung berhasil disimpan!");
+        document.getElementById('input-kawasan-utama').value = "";
+        document.getElementById('input-sub-tower').value = "";
     };
 
     if(userRoleKunci === "Admin Gedung") {
@@ -463,16 +492,19 @@ function aktifkanFiturAdmin() {
 
     document.getElementById('btn-submit-area-baru').onclick = () => {
         const gd = document.getElementById('input-area-pilih-gedung').value;
-        const targetSkuad = document.getElementById('input-target-nama-skuad').value.trim();
-        const namaArea = document.getElementById('input-nama-area-baru').value.trim();
+        const targetSkuad = document.getElementById('input-target-nama-skuad').value;
+        const selectArea = document.getElementById('select-area-template').value;
+        const customArea = document.getElementById('input-nama-area-baru').value.trim();
         const kat = document.getElementById('input-jenis-tugas-kategori').value; 
         const shiftDipilih = document.getElementById('input-shift-tugas-admin').value; 
         const txtDetailJob = document.getElementById('input-detail-job-step').value.trim(); 
 
-        if(!targetSkuad || !namaArea) { alert("Isi Target Skuad & Rincian Area Tugas!"); return; }
+        const namaAreaFinal = customArea || selectArea;
+
+        if(!targetSkuad || !namaAreaFinal) { alert("Pilih Skuad & Tentukan Area Tugas!"); return; }
         
         set(ref(db, `monitoring_area/${gd}/${todayStr}/task_${Date.now()}`), {
-            area: namaArea, status: "Belum Dikerjakan", skuadTarget: targetSkuad, kategori: kat, shiftKerja: shiftDipilih, detailJob: txtDetailJob, jamLapor: "-"
+            area: namaAreaFinal, status: "Belum Dikerjakan", skuadTarget: targetSkuad, kategori: kat, shiftKerja: shiftDipilih, detailJob: txtDetailJob, jamLapor: "-"
         });
         alert("Instruksi Tugas Resmi Berhasil Dikirim!");
         document.getElementById('input-nama-area-baru').value = "";
@@ -486,6 +518,19 @@ function aktifkanFiturAdmin() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    // EVALUASI PENGECEKAN KERJA ADMIN
+    window.evalPekerjaanLuar = function(gdId, taskId, statusBaru) {
+        let catatanAdmin = "-";
+        if(statusBaru === "Kurang Bersih") {
+            catatanAdmin = prompt("Masukkan catatan koreksi untuk skuad lapangan:");
+            if(!catatanAdmin) return;
+        }
+        update(ref(db, `monitoring_area/${gdId}/${todayStr}/${taskId}`), {
+            status: statusBaru,
+            catatan: catatanAdmin
+        }).then(() => alert(`Status tugas diperbarui menjadi: ${statusBaru}`));
     };
 
     onValue(ref(db, 'daftar_gedung'), (snapshotGedung) => {
@@ -510,7 +555,7 @@ function aktifkanFiturAdmin() {
                         btnDownload = `<button style="background:#25d366; color:white; font-size:10px; padding:2px 5px; margin-top:4px; border:none; border-radius:3px;" onclick="downloadFotoBukti('${item.fotoBukti}', 'Bukti_Kerja_${item.area}.jpg')"><i class="fa-solid fa-download"></i> Download WA</button>`;
                     }
                     
-                    let noteEvaluasi = item.catatan ? `<br><small style="color:var(--danger); font-weight:bold;">Koreksi: ${item.catatan}</small>` : '';
+                    let noteEvaluasi = item.catatan && item.catatan !== "-" ? `<br><small style="color:var(--danger); font-weight:bold;">Koreksi: ${item.catatan}</small>` : '';
 
                     tr.innerHTML = `
                         <td>
@@ -518,7 +563,7 @@ function aktifkanFiturAdmin() {
                             <span class="badge-status" style="background:purple; font-size:9px; padding:1px 4px; color:white; border-radius:3px;">${item.kategori || 'Rutin'}</span><br>
                             <small style="color:#555;">📌 <b>${item.shiftKerja || 'General'}</b></small>
                         </td>
-                        <td><b>${item.area}</b>${noteEvaluasi}<br><small style="color:#666;">Jam Lapor: ${item.jamLapor || '-'}</small></td>
+                        <td><b>${item.area}</b>${noteEvaluasi}<br><small style="color:#666;">Jam Lapor: ${item.jamLapor || '-'}</small><br><small style="color:blue;">Status: ${item.status}</small></td>
                         <td style="text-align:center;">${tagFotoKerja}<br>${btnDownload}</td>
                         <td>
                             <div style="display:flex; flex-direction:column; gap:4px;">
@@ -559,104 +604,66 @@ function aktifkanFiturAdmin() {
         }
     });
 
+    // LINK KODE MONITORING ABSENSI GLOBAL YANG TERPOTONG
     onValue(ref(db, 'absensi_global'), (snapshotGedungAbsen) => {
         const rootAbsen = snapshotGedungAbsen.val() || {};
-        const tbodyAbsen = document.getElementById('table-rekap-absen-body'); if(tbodyAbsen) tbodyAbsen.innerHTML = "";
+        const tbodyAbsen = document.getElementById('table-rekap-absensi-admin-body'); 
+        if(tbodyAbsen) tbodyAbsen.innerHTML = "";
 
-        for(let idGedung in rootAbsen) {
-            if (userRoleKunci === "Admin Gedung" && idGedung !== userGedungKunci) continue;
-            for(let bln in rootAbsen[idGedung]) {
-                for(let tgl in rootAbsen[idGedung][bln]) {
-                    for(let uid in rootAbsen[idGedung][bln][tgl]) {
-                        const r = rootAbsen[idGedung][bln][tgl][uid];
-                        const tr = document.createElement('tr');
-                        let tagFoto = r.fotoMasuk ? `<img src="${r.fotoMasuk}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;" onclick="window.open('${r.fotoMasuk}','_blank')">` : 'Tidak Ada Foto';
-
-                        tr.innerHTML = `
-                            <td><b>${r.nama}</b><br><small style="color:#666;">Gedung: ${idGedung.replace(/_-_/g,' ')}</small></td>
-                            <td><span class="badge-status" style="background:var(--primary); color:white; font-size:10px; padding:2px 4px; border-radius:3px;">${r.shift}</span></td>
-                            <td style="text-align:center;">${tagFoto}</td>
-                            <td>
-                                <small>
-                                    <b>Masuk:</b> ${r.masukLog || '-'}<br>
-                                    <b>Pulang:</b> ${r.pulangLog || '-'}<br>
-                                    <button style="background:#f59e0b; color:white; font-size:9px; padding:2px 4px; margin-top:6px; border:none; border-radius:3px;" onclick="editJamMasukManual('${idGedung}','${bln}','${tgl}','${uid}')">✏️ Edit Jam Kerja</button>
-                                </small>
-                            </td>
-                        `;
-                        if(tbodyAbsen) tbodyAbsen.appendChild(tr);
+        for (let gdId in rootAbsen) {
+            if (userRoleKunci === "Admin Gedung" && gdId !== userGedungKunci) continue;
+            
+            if (rootAbsen[gdId][currentMonthStr] && rootAbsen[gdId][currentMonthStr][todayStr]) {
+                const dataHariIni = rootAbsen[gdId][currentMonthStr][todayStr];
+                
+                for (let uid in dataHariIni) {
+                    const log = dataHariIni[uid];
+                    const tr = document.createElement('tr');
+                    
+                    let viewSelfie = '<span style="color:#aaa;">No Photo</span>';
+                    if(log.fotoMasuk) {
+                        viewSelfie = `<img src="${log.fotoMasuk}" style="width:50px; height:50px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="window.open('${log.fotoMasuk}','_blank')">`;
                     }
+                    
+                    tr.innerHTML = `
+                        <td><b>${log.nama || 'Skuad'}</b><br><small style="color:#666;">${gdId.replace(/_-_/g, ' ')}</small></td>
+                        <td><small style="font-size:11px;">${log.masukLog || '-'}</small></td>
+                        <td><small style="font-size:11px; color:green; font-weight:bold;">${log.pulangLog || 'Sedang Bekerja'}</small></td>
+                        <td style="text-align:center;">${viewSelfie}</td>
+                    `;
+                    if(tbodyAbsen) tbodyAbsen.appendChild(tr);
                 }
             }
         }
     });
+}
 
-    window.editJamMasukManual = function(idGedung, bln, tgl, uid) {
-        const inputJamBaru = prompt("Masukkan tanggal & jam masuk baru:");
-        if (!inputJamBaru) return;
-        update(ref(db, `absensi_global/${idGedung}/${bln}/${tgl}/${uid}`), {
-            masukLog: inputJamBaru, timestampMasuk: Date.now() - (8 * 60 * 60 * 1000)
-        }).then(() => alert("Jam kerja masuk sukses diubah manual!"));
-    };
-
-    function renderBukuRekapIsuAdmin() {
-        onValue(ref(db, `laporan_isu_global/${currentMonthStr}`), (snap) => {
-            const data = snap.val() || {};
-            const tbody = document.getElementById('table-rekap-isu-body'); if(tbody) tbody.innerHTML = "";
-            for (let id in data) {
+function renderBukuRekapIsuAdmin() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const currentMonthStr = todayStr.substring(0, 7);
+    
+    onValue(ref(db, `laporan_isu_global/${currentMonthStr}`), (snapshot) => {
+        const data = snapshot.val() || {};
+        const tbody = document.getElementById('table-rekap-isu-admin-body');
+        if(tbody) {
+            tbody.innerHTML = "";
+            for(let id in data) {
                 if(userRoleKunci === "Admin Gedung" && data[id].gedung !== userGedungKunci) continue;
-                if(tbody) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${data[id].waktu}</td><td><b>${data[id].pelapor}</b><br><small>${data[id].gedung.replace(/_-_/g,' ')}</small></td><td><b>${data[id].lokasiSpesifik}</b></td><td>${data[id].deskripsi}</td>`;
-                    tbody.appendChild(tr);
-                }
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><small>${data[id].waktu}</small><br><b>${data[id].pelapor}</b></td>
+                    <td><span style="color:purple; font-weight:bold;">${data[id].gedung.replace(/_-_/g, ' ')}</span><br>${data[id].lokasiSpesifik}</td>
+                    <td><p style="margin:0; color:#dc2626; font-weight:500;">${data[id].deskripsi}</p></td>
+                `;
+                tbody.appendChild(tr);
             }
-        });
-    }
+        }
+    });
+}
 
-    document.getElementById('btn-export-excel-absensi').onclick = () => {
-        onValue(ref(db, 'absensi_global'), (snapshot) => {
-            const root = snapshot.val() || {};
-            let csvContent = "data:text/csv;charset=utf-8,NAMA SKUAD,SHIFT,GEDUNG,LOG JAM MASUK,LOG JAM PULANG\n";
-            for(let gd in root) {
-                if(userRoleKunci === "Admin Gedung" && gd !== userGedungKunci) continue;
-                for(let bln in root[gd]) {
-                    for(let tgl in root[gd][bln]) {
-                        for(let uid in root[gd][bln][tgl]) {
-                            const r = root[gd][bln][tgl][uid];
-                            csvContent += `"${r.nama}","${r.shift}","${gd.replace(/_-_/g,' ')}","${r.masukLog || '-'}","${r.pulangLog || '-'}"\n`;
-                        }
-                    }
-                }
-            }
-            unduhCSVFile(csvContent, `Rekap_Absensi_Skuad_${currentMonthStr}.csv`);
-        }, { onlyOnce: true });
+// FORMAT EXCEL SPREADSHEET / PRINT REKAP KERJA HARI INI
+if(document.getElementById('btn-export-excel-kerja')) {
+    document.getElementById('btn-export-excel-kerja').onclick = () => {
+        window.print();
     };
 }
-
-function unduhCSVFile(csvContent, namaFile) {
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", namaFile);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-window.evalPekerjaanLuar = function(gd, id, statusBaru) {
-    let note = "";
-    if (statusBaru === "Kurang Bersih") {
-        note = prompt("Masukkan rincian evaluasi koreksi area kerja:");
-        if (note === null) return; 
-    }
-    update(ref(db, `monitoring_area/${gd}/${new Date().toISOString().split('T')[0]}/${id}`), {
-        status: statusBaru, catatan: note
-    }).then(() => alert(`Evaluasi sukses diperbarui!`));
-};
-
-window.hapusGedungMaster = function(idGedung) {
-    if (confirm(`Hapus kontrak master gedung "${idGedung.replace(/_-_/g, ' ')}"?`)) {
-        remove(ref(db, `daftar_gedung/${idGedung}`)).then(() => alert("Data Kontrak Master Berhasil Dihapus."));
-    }
-};
