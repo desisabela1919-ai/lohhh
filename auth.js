@@ -84,7 +84,6 @@ if(btnLogout) {
 }
 
 // MONITORING STATUS LOGIN USER & SUNTIK INFO HEADER
-// (Catatan: Fungsi aktifkanFiturKaryawan & aktifkanFiturAdmin nanti di-import dari modulnya masing-masing)
 import { resetHalamanKaryawan, aktifkanFiturKaryawan } from "./karyawan.js";
 import { aktifkanFiturAdmin } from "./admin.js";
 
