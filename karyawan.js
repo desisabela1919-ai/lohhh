@@ -5,6 +5,11 @@ import { currentUserUID, userGedungKunci, userShiftKunci, userNamaKunci } from "
 let flagAbsenMode = "masuk";
 let idTargetPekerjaanKlik = "";
 
+// Ambil data tanggal real-time global untuk sinkronisasi sub-modul karyawan
+const dGlobal = new Date();
+const todayStr = dGlobal.toISOString().split('T')[0];
+const currentMonthStr = todayStr.substring(0, 7);
+
 // RE-USEABLE SYSTEM: RESET LAYOUT SUB-MENU KARYAWAN
 export function resetHalamanKaryawan() {
     if(document.getElementById('karyawan-menu-grup')) document.getElementById('karyawan-menu-grup').style.display = 'block';
@@ -19,10 +24,6 @@ export function resetHalamanKaryawan() {
 // MODUL KARYAWAN: ABSENSI DENGAN TIMING DAN KAMERA HP
 // ================================================================= */
 export function aktifkanFiturKaryawan() {
-    const d = new Date();
-    const todayStr = d.toISOString().split('T')[0];
-    const currentMonthStr = todayStr.substring(0, 7);
-
     // Listener Realtime Absensi Skuad
     onValue(ref(db, `absensi_global/${userGedungKunci}/${currentMonthStr}`), (snapshot) => {
         const dataBulanIni = snapshot.val() || {};
@@ -69,7 +70,11 @@ export function aktifkanFiturKaryawan() {
                 if(btnMasuk) btnMasuk.disabled = true; 
                 if(btnPulang) btnPulang.disabled = false;
             } else {
-                if(kartuAbsenContainer) kartuAbsenContainer.style.display = 'none';
+                // Tetap munculkan kartu absen agar tombol Pulang bisa diakses meskipun belum 8 jam jika mendesak
+                if(kartuAbsenContainer) kartuAbsenContainer.style.display = 'block';
+                if(stateLabel) { stateLabel.className = "status-sudah-masuk"; stateLabel.textContent = `Sedang Bekerja (Tombol Pulang Siap)`; }
+                if(btnMasuk) btnMasuk.disabled = true; 
+                if(btnPulang) btnPulang.disabled = false;
             }
         } else {
             if(kartuAbsenContainer) kartuAbsenContainer.style.display = 'block';
