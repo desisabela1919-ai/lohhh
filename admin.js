@@ -6,7 +6,12 @@ import { userGedungKunci, userRoleKunci } from "./auth.js";
 // MODUL MANAGEMENT CONTROL BACK-OFFICE SUPERVISOR / ADMIN 
 // ================================================================= */
 export function aktifkanFiturAdmin() {
-    const todayStr = new Date().toISOString().split('T')[0];
+    // SINKRONISASI TANGGAL LOKAL (WIB / id-ID) - Menghindari Bug ISO String beda hari
+    const dLocal = new Date();
+    const tglLokal = dLocal.getDate().toString().padStart(2, '0');
+    const blnLokal = (dLocal.getMonth() + 1).toString().padStart(2, '0');
+    const thnLokal = dLocal.getFullYear();
+    const todayStr = `${thnLokal}-${blnLokal}-${tglLokal}`; // Format: YYYY-MM-DD sesuai Firebase
 
     // Batasi hak akses menu khusus Admin Pusat
     const blockPusat = document.getElementById('block-admin-pusat-only');
@@ -34,7 +39,6 @@ export function aktifkanFiturAdmin() {
     if(btnTutupIsu) btnTutupIsu.onclick = () => { const h = document.getElementById('halaman-pantau-isu-admin'); if(h) h.style.display = 'none'; };
 
     // REALTIME LISTENER EVALUASI LAPANGAN (UNTUK ADMIN / SUPERVISOR)
-    // Berfungsi menampilkan data tugas yang berstatus "Menunggu Pengecekan"
     onValue(ref(db, `monitoring_area/${userGedungKunci}/${todayStr}`), (snapshot) => {
         const dataKerja = snapshot.val() || {};
         const tbodyEvaluasi = document.getElementById('table-pantau-area-body');
@@ -61,7 +65,7 @@ export function aktifkanFiturAdmin() {
                         <td>
                             <div style="display:flex; gap:4px;">
                                 <button style="background:var(--success); color:white; padding:4px 6px; font-size:11px; border-radius:4px; width:auto; border:none; cursor:pointer;" onclick="adminApproveKerja('${userGedungKunci}', '${todayStr}', '${idKerja}')">Lulus Cek</button>
-                                <button style="background:var(--danger); color:white; padding:4px 6px; font-size:11px; border-radius:4px; width:auto; border:none; cursor:pointer;" onclick="adminTolakKerja('${userGedungKunci}', '${todayStr}', '--Koreksi--')">Koreksi</button>
+                                <button style="background:var(--danger); color:white; padding:4px 6px; font-size:11px; border-radius:4px; width:auto; border:none; cursor:pointer;" onclick="adminTolakKerja('${userGedungKunci}', '${todayStr}', '${idKerja}')">Koreksi</button>
                             </div>
                         </td>
                     `;
@@ -84,7 +88,6 @@ export function aktifkanFiturAdmin() {
             selectSkuad.innerHTML = `<option value="">-- Pilih Anggota Skuad --</option>`;
             for (let uid in users) {
                 const u = users[uid];
-                // Hanya masukkan karyawan aktif yang lokasinya sama dengan admin, atau tampilkan semua jika Admin Pusat
                 if (u.status === "Aktif" && u.role === "Karyawan" && (u.gedung === userGedungKunci || userRoleKunci === "Admin Pusat")) {
                     selectSkuad.innerHTML += `<option value="${u.nama}">${u.nama}</option>`;
                 }
@@ -92,18 +95,35 @@ export function aktifkanFiturAdmin() {
         }
     });
 
-    // INTERSEPSI ENGINE: TOMBOL KIRIM TUGAS RESMI (ADMIN KE KARYAWAN)
-    const btnSubmitTugas = document.getElementById('btn-submit-area-baru-v2');
+    // INTERSEPSI ENGINE: TOMBOL KIRIM TUGAS RESMI (DENGAN BEBERAPA PILIHAN FALLBACK ID ELEMENT)
+    const btnSubmitTugas = document.getElementById('btn-submit-area-baru-v2') || document.getElementById('btn-submit-area-baru');
     if (btnSubmitTugas) {
         btnSubmitTugas.onclick = function() {
-            const areaPilih = document.getElementById('input-area-pilih-gedung') ? document.getElementById('input-area-pilih-gedung').value : userGedungKunci;
-            const namaAreaSpesifik = document.getElementById('input-nama-area-spesifik') ? document.getElementById('input-nama-area-spesifik').value.trim() : "";
-            const skuadTarget = document.getElementById('input-target-nama-skuad') ? document.getElementById('input-target-nama-skuad').value : "";
-            const shiftKerja = document.getElementById('input-shift-kerja-tugas') ? document.getElementById('input-shift-kerja-tugas').value : "Shift 1";
-            const detailJobText = document.getElementById('input-rincian-tugas-checklist') ? document.getElementById('input-rincian-tugas-checklist').value.trim() : "";
+            // Deteksi ID area pilih gedung
+            const elGedung = document.getElementById('input-area-pilih-gedung') || document.getElementById('input-area-gedung');
+            const areaPilih = elGedung ? elGedung.value : userGedungKunci;
+
+            // Deteksi ID input area spesifik (Mendeteksi ID lu yang mungkin 'input-nama-area' atau sejenisnya)
+            const elAreaSpesifik = document.getElementById('input-nama-area-spesifik') || document.getElementById('input-nama-area') || document.querySelector('input[placeholder*="Toilet"]');
+            const namaAreaSpesifik = elAreaSpesifik ? elAreaSpesifik.value.trim() : "";
+
+            // Deteksi ID target skuad
+            const elSkuad = document.getElementById('input-target-nama-skuad') || document.getElementById('input-target-skuad');
+            const skuadTarget = elSkuad ? elSkuad.value : "";
+
+            // Deteksi ID shift kerja
+            const elShift = document.getElementById('input-shift-kerja-tugas') || document.getElementById('input-shift-kerja');
+            const shiftKerja = elShift ? elShift.value : "Shift 1";
+
+            // Deteksi ID rincian checklist tugas
+            const elDetailJob = document.getElementById('input-rincian-tugas-checklist') || document.getElementById('input-rincian-tugas') || document.querySelector('textarea');
+            const detailJobText = elDetailJob ? elDetailJob.value.trim() : "";
+
+            // LOG VALIDASI DIAGNOSTIK KE KONSOL BROWSER JIKA MASIH GAGAL
+            console.log("Data Input Kirim:", { areaPilih, namaAreaSpesifik, skuadTarget, shiftKerja, detailJobText });
 
             if (!namaAreaSpesifik || !skuadTarget || !detailJobText) {
-                alert("Gagal Kirim! Nama Area, Skuad Pelaksana, & Rincian Tugas wajib diisi!");
+                alert("Gagal Kirim! Nama Area, Skuad Pelaksana, & Rincian Tugas wajib diisi!\n\nPeriksa kembali isi form Anda.");
                 return;
             }
 
@@ -121,8 +141,8 @@ export function aktifkanFiturAdmin() {
                 jamLapor: "-"
             }).then(() => {
                 alert(`Tugas sukses dikirim ke ${skuadTarget}! Karyawan bisa langsung cek aplikasi.`);
-                if(document.getElementById('input-nama-area-spesifik')) document.getElementById('input-nama-area-spesifik').value = "";
-                if(document.getElementById('input-rincian-tugas-checklist')) document.getElementById('input-rincian-tugas-checklist').value = "";
+                if(elAreaSpesifik) elAreaSpesifik.value = "";
+                if(elDetailJob) elDetailJob.value = "";
             }).catch((err) => alert("Firebase Error: " + err.message));
         };
     }
@@ -134,7 +154,6 @@ export function aktifkanFiturAdmin() {
             const namaGedungBaru = document.getElementById('input-nama-gedung-master') ? document.getElementById('input-nama-gedung-master').value.trim() : "";
             if (!namaGedungBaru) { alert("Masukkan nama gedung terlebih dahulu!"); return; }
             
-            // Format ID Firebase: hilangkan spasi/ganti karakter ilegal
             const idGedungFormat = namaGedungBaru.replace(/\s+/g, '_-_');
             set(ref(db, `daftar_gedung/${idGedungFormat}`), {
                 namaGedung: namaGedungBaru,
@@ -180,7 +199,7 @@ function renderBukuRekapIsuAdmin() {
     const currentMonthStr = new Date().toISOString().substring(0, 7);
     onValue(ref(db, `laporan_isu_global/${currentMonthStr}`), (snapshot) => {
         const dataIsu = snapshot.val() || {};
-        const tbodyIsu = document.getElementById('table-rekap-isu-body'); // Sesuaikan ID element di HTML dashboard lu
+        const tbodyIsu = document.getElementById('table-rekap-isu-body');
         if (tbodyIsu) {
             tbodyIsu.innerHTML = "";
             let adaIsu = false;
