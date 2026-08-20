@@ -1,0 +1,250 @@
+// SIMULASI DATABASE LOCAL STORAGE
+const USERS_KEY = "SCH_USERS";
+const CURRENT_USER_KEY = "SCH_CURRENT_USER";
+
+// Inisialisasi Akun Default
+function initDefaultUsers() {
+    if (!localStorage.getItem(USERS_KEY)) {
+        const defaultUsers = [
+            { username: "karyawan", password: "123", name: "Adriansyah", role: "karyawan" },
+            { username: "leader", password: "123", name: "Budi Santoso", role: "leader" },
+            { username: "admin", password: "123", name: "Super Admin", role: "admin" }
+        ];
+        localStorage.setItem(USERS_KEY, JSON.stringify(defaultUsers));
+    }
+}
+initDefaultUsers();
+
+// CHECK SESSION ON LOAD
+document.addEventListener("DOMContentLoaded", () => {
+    const activeUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+    if (activeUser) {
+        showAppUI(activeUser);
+    }
+});
+
+// LOGIC LOGIN
+function handleLogin(e) {
+    e.preventDefault();
+    const u = document.getElementById("login-username").value;
+    const p = document.getElementById("login-password").value;
+    const users = JSON.parse(localStorage.getItem(USERS_KEY));
+
+    const found = users.find(user => user.username === u && user.password === p);
+
+    if (found) {
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(found));
+        document.getElementById("login-alert").classList.add("d-none");
+        showAppUI(found);
+    } else {
+        const alert = document.getElementById("login-alert");
+        alert.textContent = "Username atau password salah!";
+        alert.classList.remove("d-none");
+    }
+}
+
+function fillDemo(role) {
+    document.getElementById("login-username").value = role;
+    document.getElementById("login-password").value = "123";
+}
+
+function handleLogout() {
+    localStorage.removeItem(CURRENT_USER_KEY);
+    document.getElementById("app-wrapper").classList.add("d-none");
+    document.getElementById("login-page").classList.remove("d-none");
+}
+
+function showAppUI(user) {
+    document.getElementById("login-page").classList.add("d-none");
+    document.getElementById("app-wrapper").classList.remove("d-none");
+
+    // Set Info User
+    document.getElementById("user-name-display").textContent = user.name;
+    document.getElementById("user-avatar").textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById("profile-name").textContent = user.name;
+    document.getElementById("profile-role").textContent = user.role.toUpperCase();
+    document.getElementById("profile-avatar").textContent = user.name.charAt(0).toUpperCase();
+
+    const roleBadge = document.getElementById("user-role-badge");
+    roleBadge.textContent = user.role;
+
+    // Sembunyikan/Tampilkan Menu Tambah Tim
+    const leaderMenus = document.querySelectorAll(".menu-leader-only");
+    if (user.role === "leader" || user.role === "admin") {
+        leaderMenus.forEach(m => m.classList.remove("d-none"));
+    } else {
+        leaderMenus.forEach(m => m.classList.add("d-none"));
+    }
+
+    loadChecklistItems();
+    navigateTo('dashboard');
+}
+
+// ROUTING SPA & NAVIGATION
+function navigateTo(pageId, navElement = null) {
+    document.querySelectorAll(".page-content").forEach(p => p.classList.remove("active-page"));
+    const targetPage = document.getElementById(`page-${pageId}`);
+    if (targetPage) {
+        targetPage.classList.add("active-page");
+    }
+
+    if (navElement) {
+        document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+        navElement.classList.add("active");
+    }
+
+    // Auto-hide bottom nav saat masuk ke form-form detail agar layar lega
+    const bottomNav = document.getElementById("bottom-nav");
+    if (['infrastruktur', 'defect', 'chemical', 'polybag', 'catatan', 'register'].includes(pageId)) {
+        bottomNav.classList.add("d-none");
+    } else {
+        bottomNav.classList.remove("d-none");
+    }
+}
+
+// CHECKLIST SYSTEM
+const checklistData = {
+    pagi: ["Lobby Utama", "Toilet Lt. 1", "Lift Penumpang", "Koridor Utama", "Tangga Darurat", "Loading Dock"],
+    middle: ["Poles Kaca Facade", "Deep Cleaning Toilet", "Vacuum Plafon Lobby", "Scrubber Floor Lt. 1"],
+    sore: ["Pengosongan Tempat Sampah", "Mop Area Lobby", "Sanitasi Lift"],
+    mingguan: ["Area Basement", "Roof Top", "Mushola", "Gudang Kebersihan"]
+};
+
+function loadChecklistItems() {
+    const shift = document.getElementById("checklist-shift-select").value;
+    const container = document.getElementById("checklist-items-container");
+    container.innerHTML = "";
+
+    const items = checklistData[shift] || [];
+    items.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "form-check card p-2 mb-2 border-light bg-light d-flex justify-content-between align-items-center flex-row";
+        div.innerHTML = `
+            <label class="form-check-label small fw-bold text-dark" for="check-${idx}">${item}</label>
+            <input class="form-check-input ms-2" type="checkbox" id="check-${idx}" style="transform: scale(1.2);">
+        `;
+        container.appendChild(div);
+    });
+}
+
+function submitChecklist(e) {
+    e.preventDefault();
+    alert("Checklist berhasil disimpan ke sistem!");
+    navigateTo('dashboard');
+}
+
+function submitForm(e, title) {
+    e.preventDefault();
+    alert(`Data ${title} berhasil dikirim!`);
+    navigateTo('dashboard');
+}
+
+// REGISTRASI TIM BARU
+function handleRegister(e) {
+    e.preventDefault();
+    const name = document.getElementById("reg-fullname").value;
+    const username = document.getElementById("reg-username").value;
+    const password = document.getElementById("reg-password").value;
+    const role = document.getElementById("reg-role").value;
+
+    const users = JSON.parse(localStorage.getItem(USERS_KEY));
+    users.push({ username, password, name, role });
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+    alert(`Anggota tim ${name} berhasil didaftarkan!`);
+    navigateTo('dashboard');
+}
+
+// CANVAS KOLASE FOTO & WATERMARK LOGIC
+let selectedLayout = 1;
+let uploadedImages = [];
+
+function setLayout(count, btn) {
+    selectedLayout = count;
+    document.querySelectorAll('#page-collage .btn-outline-primary').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function handleImageUpload(e) {
+    const files = Array.from(e.target.files);
+    uploadedImages = [];
+    
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => uploadedImages.push(img);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function generateCollage() {
+    if (uploadedImages.length === 0) {
+        alert("Pilih minimal 1 foto terlebih dahulu!");
+        return;
+    }
+
+    const canvas = document.getElementById("collage-canvas");
+    const ctx = canvas.getContext("2d");
+    const placeholder = document.getElementById("canvas-placeholder");
+
+    canvas.width = 800;
+    canvas.height = 800;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Dynamic Layout Rendering
+    if (selectedLayout === 1 || uploadedImages.length === 1) {
+        drawImageCover(ctx, uploadedImages[0], 0, 0, 800, 720);
+    } else if (selectedLayout === 2 || uploadedImages.length === 2) {
+        drawImageCover(ctx, uploadedImages[0], 0, 0, 800, 355);
+        drawImageCover(ctx, uploadedImages[1] || uploadedImages[0], 0, 365, 800, 355);
+    } else {
+        drawImageCover(ctx, uploadedImages[0], 0, 0, 395, 355);
+        drawImageCover(ctx, uploadedImages[1] || uploadedImages[0], 405, 0, 395, 355);
+        drawImageCover(ctx, uploadedImages[2] || uploadedImages[0], 0, 365, 395, 355);
+        drawImageCover(ctx, uploadedImages[3] || uploadedImages[0], 405, 365, 395, 355);
+    }
+
+    // Watermark Area (Bottom Banner)
+    ctx.fillStyle = "#0B3C91";
+    ctx.fillRect(0, 720, 800, 80);
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 22px Arial";
+    ctx.fillText("SMART CLEAN HUB - DOCUMENTATION", 20, 752);
+
+    const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+    const area = document.getElementById("collage-area").value || "General Area";
+    const now = new Date();
+    const dateStr = `${now.toLocaleDateString('id-ID')} - ${now.toLocaleTimeString('id-ID')}`;
+
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#F59E0B";
+    ctx.fillText(`Area: ${area} | Oleh: ${currentUser.name} | ${dateStr}`, 20, 780);
+
+    placeholder.style.display = "none";
+    canvas.style.display = "inline-block";
+}
+
+function drawImageCover(ctx, img, x, y, w, h) {
+    const imgRatio = img.width / img.height;
+    const rectRatio = w / h;
+    let sx, sy, sw, sh;
+
+    if (imgRatio > rectRatio) {
+        sh = img.height;
+        sw = img.height * rectRatio;
+        sx = (img.width - sw) / 2;
+        sy = 0;
+    } else {
+        sw = img.width;
+        sh = img.width / rectRatio;
+        sx = 0;
+        sy = (img.height - sh) / 2;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
