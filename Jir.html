@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Clean Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0B3C91',
+                        accent: '#F59E0B',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        background: '#F3F4F6',
+                        surface: '#FFFFFF'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #e5e7eb; /* Darker background for desktop to highlight mobile frame */
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #F3F4F6;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Page transition styles */
+        .page-view {
+            display: none;
+            flex: 1;
+            padding-bottom: 80px; /* Space for bottom nav */
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .page-view.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- ======================= -->
+        <!-- VIEW: LOGIN PAGE        -->
+        <!-- ======================= -->
+        <div id="view-login" class="page-view active bg-surface min-h-screen flex flex-col items-center justify-center p-6 pb-6">
+            <div class="w-full max-w-sm">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <i class="fa-solid fa-broom text-4xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">SMART CLEAN HUB</h1>
+                    <p class="text-gray-500 text-sm mt-1">Sistem Operasional Team Cleaning</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username / NIK</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" id="login-username" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors" placeholder="Masukkan NIK atau Username">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="login-password" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors" placeholder="Masukkan Password">
+                        </div>
+                    </div>
+                    
+                    <button onclick="handleLogin()" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 mt-4">
+                        Masuk
+                    </button>
+                    
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg text-xs text-blue-800 border border-blue-100">
+                        <p class="font-bold mb-1"><i class="fa-solid fa-info-circle mr-1"></i> Demo Akun (Simulasi PHP Session):</p>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li>Admin: <b>admin</b> | pass: <b>123</b></li>
+                            <li>Leader: <b>leader</b> | pass: <b>123</b></li>
+                            <li>Karyawan: <b>karyawan</b> | pass: <b>123</b></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: DASHBOARD         -->
+        <!-- ======================= -->
+        <div id="view-dashboard" class="page-view relative">
+            <!-- Header Background -->
+            <div class="bg-primary rounded-b-[40px] pt-8 pb-16 px-6 text-white shadow-md relative z-0">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <div class="text-sm opacity-90 flex items-center gap-2">
+                            <i class="fa-solid fa-sun text-accent"></i> Selamat Pagi,
+                        </div>
+                        <h2 id="dash-name" class="text-2xl font-bold">Adriansyah 👋</h2>
+                        <div id="dash-role" class="text-xs bg-blue-800 inline-block px-2 py-1 rounded mt-1 border border-blue-600">Team Leader</div>
+                    </div>
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary text-xl font-bold shadow-inner cursor-pointer" onclick="showToast('Menu Profil Belum Tersedia')">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+                <p class="text-sm italic opacity-80 mt-2">"Kebersihan hari ini menentukan kenyamanan esok."</p>
+            </div>
+
+            <!-- Progress Card (Overlapping) -->
+            <div class="px-5 -mt-10 relative z-10">
+                <div class="bg-surface rounded-2xl shadow-lg p-5 border border-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-gray-800 text-sm">Progress Hari Ini</h3>
+                        <span class="text-primary font-bold text-sm">85%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                        <div class="bg-primary h-2.5 rounded-full" style="width: 85%"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="bg-green-50 p-2 rounded-lg border border-green-100">
+                            <div class="font-bold text-success text-lg">28</div>
+                            <div class="text-gray-500">Selesai</div>
+                        </div>
+                        <div class="bg-red-50 p-2 rounded-lg border border-red-100">
+                            <div class="font-bold text-danger text-lg">2</div>
+                            <div class="text-gray-500">Belum</div>
+                        </div>
+                        <div class="bg-orange-50 p-2 rounded-lg border border-orange-100">
+                            <div class="font-bold text-accent text-lg">3</div>
+                            <div class="text-gray-500">Defect</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Menu Grid -->
+            <div class="px-6 py-6">
+                <h3 class="font-bold text-gray-800 mb-4 text-sm">Menu Operasional</h3>
+                <div class="grid grid-cols-4 gap-y-6 gap-x-2">
+                    
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('checklist')">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-100 text-primary flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Checklist</span>
+                    </div>
+                    
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('collage')">
+                        <div class="w-14 h-14 rounded-2xl bg-green-100 text-success flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90 relative">
+                            <div class="absolute -top-1 -right-1 bg-red-500 w-3 h-3 rounded-full border-2 border-white"></div>
+                            <i class="fa-solid fa-camera-retro"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Kolase Foto</span>
+                    </div>
+
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('infrastruktur')">
+                        <div class="w-14 h-14 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90">
+                            <i class="fa-solid fa-building-circle-exclamation"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Infrastruktur</span>
+                    </div>
+
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('defect')">
+                        <div class="w-14 h-14 rounded-2xl bg-red-100 text-danger flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90 relative">
+                            <span class="absolute -top-2 -right-2 bg-danger text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">3</span>
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Defect</span>
+                    </div>
+
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('chemical')">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90">
+                            <i class="fa-solid fa-spray-can"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Chemical</span>
+                    </div>
+
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('polybag')">
+                        <div class="w-14 h-14 rounded-2xl bg-gray-200 text-gray-600 flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Polybag</span>
+                    </div>
+
+                    <div class="flex flex-col items-center cursor-pointer" onclick="navigate('catatan')">
+                        <div class="w-14 h-14 rounded-2xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Catatan</span>
+                    </div>
+
+                    <!-- Leader/Admin Only Menu -->
+                    <div id="menu-register" class="flex flex-col items-center cursor-pointer hidden" onclick="navigate('register')">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-xl mb-2 shadow-sm transition-transform active:scale-90 border border-teal-200">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 text-center leading-tight">Tambah Tim</span>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="px-6 pb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-800 text-sm">Aktivitas Terbaru</h3>
+                    <span class="text-xs text-primary font-medium cursor-pointer">Lihat Semua</span>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-green-100 text-success flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-semibold text-gray-800">Checklist Lobby Selesai</h4>
+                            <p class="text-xs text-gray-500">Hari ini, 08:30 WIB • Oleh Budi</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-primary flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-semibold text-gray-800">Upload Foto Toilet Lv 1</h4>
+                            <p class="text-xs text-gray-500">Hari ini, 07:45 WIB • Oleh Adriansyah</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: REGISTER TEAM     -->
+        <!-- ======================= -->
+        <div id="view-register" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Tambah Karyawan Baru</h2>
+            </div>
+            
+            <div class="p-6">
+                <div class="bg-orange-50 border-l-4 border-accent p-4 rounded-r-lg mb-6 text-sm text-gray-700">
+                    <p class="font-semibold text-orange-800"><i class="fa-solid fa-shield-halved mr-1"></i> Area Terbatas</p>
+                    <p>Hanya Admin dan Team Leader yang dapat menambahkan akun baru untuk menjaga keamanan sistem.</p>
+                </div>
+
+                <form onsubmit="handleRegister(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+                            <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password Default</label>
+                        <input type="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none" value="123456">
+                        <p class="text-xs text-gray-500 mt-1">Sistem akan secara otomatis me-hash password ini (Simulasi PHP `password_hash()`).</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan / Role</label>
+                        <select required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white">
+                            <option value="karyawan">Karyawan / Cleaner</option>
+                            <option value="leader">Team Leader</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-success hover:bg-green-600 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 mt-6 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-save"></i> Simpan Data Karyawan
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: PHOTO COLLAGE     -->
+        <!-- ======================= -->
+        <div id="view-collage" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Dokumentasi Kolase</h2>
+            </div>
+            
+            <div class="p-5">
+                <p class="text-sm text-gray-600 mb-4">Buat dokumentasi Before-After atau gabungan area dengan mudah.</p>
+                
+                <!-- Format Selection -->
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Pilih Layout</label>
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button onclick="setCollageLayout(1)" id="btn-layout-1" class="border-2 border-primary bg-blue-50 py-2 rounded-lg flex flex-col items-center justify-center transition-colors layout-btn">
+                        <div class="w-8 h-8 border border-gray-400 bg-gray-200 mb-1"></div>
+                        <span class="text-xs font-medium">1 Foto</span>
+                    </button>
+                    <button onclick="setCollageLayout(2)" id="btn-layout-2" class="border-2 border-gray-200 py-2 rounded-lg flex flex-col items-center justify-center transition-colors layout-btn">
+                        <div class="w-8 h-8 flex flex-col gap-0.5 mb-1">
+                            <div class="h-1/2 border border-gray-400 bg-gray-200"></div>
+                            <div class="h-1/2 border border-gray-400 bg-gray-200"></div>
+                        </div>
+                        <span class="text-xs font-medium">2 Foto</span>
+                    </button>
+                    <button onclick="setCollageLayout(4)" id="btn-layout-4" class="border-2 border-gray-200 py-2 rounded-lg flex flex-col items-center justify-center transition-colors layout-btn">
+                        <div class="w-8 h-8 grid grid-cols-2 gap-0.5 mb-1">
+                            <div class="border border-gray-400 bg-gray-200"></div>
+                            <div class="border border-gray-400 bg-gray-200"></div>
+                            <div class="border border-gray-400 bg-gray-200"></div>
+                            <div class="border border-gray-400 bg-gray-200"></div>
+                        </div>
+                        <span class="text-xs font-medium">4 Foto</span>
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1">Area / Deskripsi</label>
+                    <input type="text" id="collage-area" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="Cth: Lobby Utama / Before-After Toilet">
+                </div>
+
+                <!-- Input File -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1">Pilih Gambar (Pilih <span id="lbl-img-count">1</span> Foto)</label>
+                    <input type="file" id="collage-upload" accept="image/*" multiple class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-blue-50 file:text-primary
+                        hover:file:bg-blue-100 cursor-pointer border border-gray-300 rounded-full p-1"
+                        onchange="handleCollageUpload(event)">
+                </div>
+
+                <!-- Canvas Preview -->
+                <div class="border border-dashed border-gray-400 bg-gray-50 rounded-lg p-2 mb-4 relative overflow-hidden flex justify-center items-center min-h-[300px]">
+                    <span id="canvas-placeholder" class="text-gray-400 text-sm absolute"><i class="fa-solid fa-image text-3xl block text-center mb-2"></i>Preview Kolase</span>
+                    <canvas id="collage-canvas" width="800" height="800" class="max-w-full h-auto shadow-sm hidden rounded"></canvas>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="generateCollage()" class="flex-1 bg-accent hover:bg-orange-600 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Buat Kolase
+                    </button>
+                    <button onclick="saveCollage()" id="btn-save-collage" disabled class="flex-1 bg-gray-300 text-gray-500 font-semibold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2 cursor-not-allowed">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-2 text-center">Data akan disimpan ke sistem dan Spreadsheet</p>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: CHECKLIST         -->
+        <!-- ======================= -->
+        <div id="view-checklist" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Checklist Harian</h2>
+            </div>
+            
+            <div class="p-4">
+                <div class="flex border-b border-gray-200 mb-4 overflow-x-auto hide-scroll pb-1 gap-4">
+                    <button class="text-primary font-semibold border-b-2 border-primary pb-2 whitespace-nowrap text-sm">Pagi</button>
+                    <button class="text-gray-500 font-medium pb-2 whitespace-nowrap text-sm">Middle/Project</button>
+                    <button class="text-gray-500 font-medium pb-2 whitespace-nowrap text-sm">Sore</button>
+                    <button class="text-gray-500 font-medium pb-2 whitespace-nowrap text-sm">Mingguan</button>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Item -->
+                    <div class="p-4 rounded-xl border border-gray-200 bg-white shadow-sm flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">Lobby Utama</h4>
+                            <p class="text-xs text-gray-500">Sapu, Pel, Kaca, Tempat Sampah</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success"></div>
+                        </label>
+                    </div>
+                    <!-- Item -->
+                    <div class="p-4 rounded-xl border border-gray-200 bg-white shadow-sm flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">Toilet Level 1</h4>
+                            <p class="text-xs text-gray-500">Urinoir, Wastafel, Kloset, Lantai</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success"></div>
+                        </label>
+                    </div>
+                    <!-- Item -->
+                    <div class="p-4 rounded-xl border border-gray-200 bg-white shadow-sm flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">Koridor Selatan</h4>
+                            <p class="text-xs text-gray-500">Vacuum Karpet, Dusting</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success"></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-3 rounded-xl shadow-md transition-all mt-6 text-sm">
+                    Simpan Laporan Shift
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: INFRASTRUKTUR     -->
+        <!-- ======================= -->
+        <div id="view-infrastruktur" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Pengecekan Infrastruktur</h2>
+            </div>
+            <div class="p-5">
+                <p class="text-sm text-gray-600 mb-4">Centang fasilitas yang mengalami kerusakan atau masalah di area kerja.</p>
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm mb-6">
+                    <label class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-gray-800 flex items-center gap-3"><i class="fa-regular fa-lightbulb text-orange-400 w-5"></i> Lampu Mati</span>
+                        <input type="checkbox" class="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300">
+                    </label>
+                    <label class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-gray-800 flex items-center gap-3"><i class="fa-solid fa-cubes text-gray-400 w-5"></i> Keramik Pecah</span>
+                        <input type="checkbox" class="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300">
+                    </label>
+                    <label class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-gray-800 flex items-center gap-3"><i class="fa-solid fa-door-open text-amber-700 w-5"></i> Pintu Rusak</span>
+                        <input type="checkbox" class="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300">
+                    </label>
+                    <label class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-gray-800 flex items-center gap-3"><i class="fa-solid fa-droplet text-blue-400 w-5"></i> Pipa / Atap Bocor</span>
+                        <input type="checkbox" class="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300">
+                    </label>
+                    <label class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-gray-800 flex items-center gap-3"><i class="fa-solid fa-elevator text-gray-600 w-5"></i> Lift Bermasalah</span>
+                        <input type="checkbox" class="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300">
+                    </label>
+                    <label class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-gray-800 flex items-center gap-3"><i class="fa-solid fa-video text-gray-800 w-5"></i> CCTV Mati</span>
+                        <input type="checkbox" class="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300">
+                    </label>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-800 mb-2">Upload Bukti Foto (Opsional)</label>
+                    <input type="file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-primary hover:file:bg-blue-100 cursor-pointer border border-gray-300 rounded-full p-1">
+                </div>
+
+                <button onclick="showToast('Laporan Infrastruktur Disimpan!'); navigate('dashboard');" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Kirim Laporan
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: DEFECT AREA       -->
+        <!-- ======================= -->
+        <div id="view-defect" class="page-view bg-surface min-h-screen">
+            <div class="bg-danger text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-700 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Laporan Defect Area</h2>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); showToast('Defect Berhasil Dilaporkan!'); navigate('dashboard');" class="p-5 space-y-5">
+                <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-xs text-red-800 flex gap-2">
+                    <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                    <p>Gunakan form ini untuk melaporkan kerusakan mendesak yang butuh penanganan segera oleh tim Engineering/Maintenance.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                    <input type="date" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-danger outline-none bg-gray-50 text-gray-600" id="defect-date">
+                    <script>document.getElementById('defect-date').valueAsDate = new Date();</script>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Area Penemuan</label>
+                    <select required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-danger outline-none bg-white">
+                        <option value="">Pilih Area...</option>
+                        <option>Lobby Utama</option>
+                        <option>Toilet Level 1</option>
+                        <option>Koridor Selatan</option>
+                        <option>Basement 1</option>
+                        <option>Lainnya</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Prioritas</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="priority" class="peer sr-only" value="normal" checked>
+                            <div class="text-center py-2 border-2 border-gray-200 rounded-xl peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all">
+                                <span class="text-xs font-bold text-gray-600 peer-checked:text-blue-700">Normal</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="priority" class="peer sr-only" value="urgent">
+                            <div class="text-center py-2 border-2 border-gray-200 rounded-xl peer-checked:border-orange-500 peer-checked:bg-orange-50 transition-all">
+                                <span class="text-xs font-bold text-gray-600 peer-checked:text-orange-700">Urgent</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="priority" class="peer sr-only" value="emergency">
+                            <div class="text-center py-2 border-2 border-gray-200 rounded-xl peer-checked:border-red-500 peer-checked:bg-red-50 transition-all">
+                                <span class="text-xs font-bold text-gray-600 peer-checked:text-red-700">Emergency</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Kerusakan</label>
+                    <textarea rows="3" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-danger outline-none" placeholder="Jelaskan detail kerusakan..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-800 mb-2">Upload Foto Kerusakan</label>
+                    <input type="file" required accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-danger hover:file:bg-red-100 cursor-pointer border border-gray-300 rounded-full p-1">
+                </div>
+
+                <button type="submit" class="w-full bg-danger hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Buat Laporan Defect
+                </button>
+            </form>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: CHEMICAL          -->
+        <!-- ======================= -->
+        <div id="view-chemical" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Pemakaian Chemical</h2>
+            </div>
+            
+            <div class="p-5">
+                <p class="text-sm text-gray-600 mb-4">Catat jumlah pemakaian chemical untuk shift hari ini.</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <!-- Item -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mx-auto mb-2">
+                            <i class="fa-solid fa-spray-can-sparkles text-xl"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-800">Glass Cleaner</h4>
+                        <div class="mt-3 flex items-center justify-center gap-1">
+                            <input type="number" min="0" placeholder="0" class="w-14 px-2 py-1 text-center border-b-2 border-gray-300 focus:border-primary outline-none text-base font-bold text-primary">
+                            <span class="text-xs text-gray-500 font-medium">Liter</span>
+                        </div>
+                    </div>
+                    <!-- Item -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-success mx-auto mb-2">
+                            <i class="fa-solid fa-bottle-water text-xl"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-800">Floor Cleaner</h4>
+                        <div class="mt-3 flex items-center justify-center gap-1">
+                            <input type="number" min="0" placeholder="0" class="w-14 px-2 py-1 text-center border-b-2 border-gray-300 focus:border-primary outline-none text-base font-bold text-primary">
+                            <span class="text-xs text-gray-500 font-medium">Liter</span>
+                        </div>
+                    </div>
+                    <!-- Item -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 mx-auto mb-2">
+                            <i class="fa-solid fa-pump-medical text-xl"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-800">Disinfectant</h4>
+                        <div class="mt-3 flex items-center justify-center gap-1">
+                            <input type="number" min="0" placeholder="0" class="w-14 px-2 py-1 text-center border-b-2 border-gray-300 focus:border-primary outline-none text-base font-bold text-primary">
+                            <span class="text-xs text-gray-500 font-medium">Liter</span>
+                        </div>
+                    </div>
+                    <!-- Item -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 mx-auto mb-2">
+                            <i class="fa-solid fa-bottle-droplet text-xl"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-800">Karbol</h4>
+                        <div class="mt-3 flex items-center justify-center gap-1">
+                            <input type="number" min="0" placeholder="0" class="w-14 px-2 py-1 text-center border-b-2 border-gray-300 focus:border-primary outline-none text-base font-bold text-primary">
+                            <span class="text-xs text-gray-500 font-medium">Liter</span>
+                        </div>
+                    </div>
+                    <!-- Item -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center col-span-2">
+                        <div class="flex items-center gap-4 text-left">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex flex-shrink-0 items-center justify-center text-gray-600">
+                                <i class="fa-solid fa-spray-can text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-bold text-gray-800">Air Freshener</h4>
+                                <p class="text-[10px] text-gray-500">Pengharum Ruangan</p>
+                            </div>
+                            <div class="flex items-center justify-center gap-1">
+                                <input type="number" min="0" placeholder="0" class="w-14 px-2 py-1 text-center border-b-2 border-gray-300 focus:border-primary outline-none text-base font-bold text-primary">
+                                <span class="text-xs text-gray-500 font-medium">Botol</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showToast('Data Chemical Disimpan!'); navigate('dashboard');" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-save"></i> Simpan Data Chemical
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: POLYBAG           -->
+        <!-- ======================= -->
+        <div id="view-polybag" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Pemakaian Polybag</h2>
+            </div>
+            
+            <div class="p-5">
+                <p class="text-sm text-gray-600 mb-4">Catat jumlah kantong plastik sampah (polybag) yang digunakan hari ini.</p>
+                
+                <div class="space-y-4 mb-6">
+                    <!-- Polybag Besar -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white">
+                                <i class="fa-solid fa-trash-can text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">Polybag Besar</h4>
+                                <p class="text-xs text-gray-500">Ukuran 90x120 cm</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" min="0" placeholder="0" class="w-16 px-2 py-2 text-center border border-gray-300 rounded-lg focus:border-primary outline-none font-bold text-gray-800">
+                            <span class="text-xs font-semibold text-gray-500">pcs</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Polybag Kecil -->
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white ml-1">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">Polybag Kecil</h4>
+                                <p class="text-xs text-gray-500">Ukuran 60x90 cm</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" min="0" placeholder="0" class="w-16 px-2 py-2 text-center border border-gray-300 rounded-lg focus:border-primary outline-none font-bold text-gray-800">
+                            <span class="text-xs font-semibold text-gray-500">pcs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showToast('Data Polybag Disimpan!'); navigate('dashboard');" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-save"></i> Simpan Data Polybag
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- VIEW: CATATAN           -->
+        <!-- ======================= -->
+        <div id="view-catatan" class="page-view bg-surface min-h-screen">
+            <div class="bg-primary text-white p-4 flex items-center gap-4 sticky top-0 z-20 shadow-md">
+                <button onclick="navigate('dashboard')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="font-bold text-lg">Catatan Harian</h2>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); showToast('Catatan Disimpan!'); navigate('dashboard');" class="p-5 space-y-5">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Catatan</label>
+                    <select required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary outline-none bg-white">
+                        <option value="">Pilih Kategori...</option>
+                        <option>Kendala Kerja</option>
+                        <option>Arahan Team Leader</option>
+                        <option>Permintaan Barang / Restock</option>
+                        <option>Informasi Penting</option>
+                        <option>Lainnya</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Isi Catatan</label>
+                    <textarea rows="6" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Tuliskan detail catatan, kendala, atau permintaan di sini..."></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-primary hover:bg-blue-800 text-white font-semibold py-3 rounded-xl shadow-md transition-all active:scale-95 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Kirim Catatan
+                </button>
+            </form>
+        </div>
+
+        <!-- ======================= -->
+        <!-- BOTTOM NAVIGATION       -->
+        <!-- ======================= -->
+        <div id="bottom-nav" class="fixed bottom-0 w-full max-w-[480px] bg-white border-t border-gray-200 flex justify-around items-center py-2 px-1 pb-safe z-40 hidden" style="padding-bottom: max(8px, env(safe-area-inset-bottom));">
+            <button onclick="navigate('dashboard')" class="flex flex-col items-center p-2 text-primary">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">Beranda</span>
+            </button>
+            <button onclick="navigate('checklist')" class="flex flex-col items-center p-2 text-gray-400 hover:text-primary transition-colors">
+                <i class="fa-solid fa-clipboard-check text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">Checklist</span>
+            </button>
+            
+            <!-- Floating FAB style middle button -->
+            <button onclick="navigate('collage')" class="flex flex-col items-center -mt-6 relative">
+                <div class="w-14 h-14 bg-accent rounded-full flex items-center justify-center text-white text-2xl shadow-lg border-4 border-white transition-transform active:scale-95">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+            </button>
+            
+            <button onclick="showToast('Notifikasi belum ada')" class="flex flex-col items-center p-2 text-gray-400 hover:text-primary transition-colors relative">
+                <span class="absolute top-1 right-2 w-2.5 h-2.5 bg-danger rounded-full border-2 border-white"></span>
+                <i class="fa-regular fa-bell text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">Notif</span>
+            </button>
+            <button onclick="doLogout()" class="flex flex-col items-center p-2 text-gray-400 hover:text-danger transition-colors">
+                <i class="fa-solid fa-power-off text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">Keluar</span>
+            </button>
+        </div>
+
+        <!-- Custom Toast Notification -->
+        <div id="toast" class="toast shadow-xl">Message here</div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // MOCK BACKEND & STATE MANAGEMENT
+        // ==========================================
+        // Ini merepresentasikan database MySQL & Session PHP
+        
+        const USERS_DB = {
+            'admin': { nama: 'Administrator', role: 'admin', password: '123' },
+            'leader': { nama: 'Adriansyah', role: 'leader', password: '123' },
+            'karyawan': { nama: 'Budi Santoso', role: 'karyawan', password: '123' }
+        };
+
+        let currentUser = null;
+        let currentLayout = 1;
+        let uploadedImages = [];
+
+        // ==========================================
+        // UI & NAVIGATION HELPERS
+        // ==========================================
+        
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "toast show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function navigate(viewId) {
+            // Hide all views
+            document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+            // Show target view
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            // Manage Bottom Nav visibility
+            const bottomNav = document.getElementById('bottom-nav');
+            // Hanya tampilkan bottom nav di halaman utama agar halaman form terlihat lebih luas (Super App style)
+            const mainViews = ['dashboard', 'checklist']; 
+            
+            if(mainViews.includes(viewId)) {
+                bottomNav.classList.remove('hidden');
+            } else {
+                bottomNav.classList.add('hidden');
+            }
+
+            // Role based UI adjustments
+            if(viewId === 'dashboard' && currentUser) {
+                document.getElementById('dash-name').innerText = currentUser.nama + " 👋";
+                
+                const roleBadge = document.getElementById('dash-role');
+                if(currentUser.role === 'admin') {
+                    roleBadge.innerText = 'Administrator';
+                    roleBadge.className = 'text-xs bg-red-600 inline-block px-2 py-1 rounded mt-1 border border-red-500 text-white';
+                    document.getElementById('menu-register').classList.remove('hidden');
+                } else if(currentUser.role === 'leader') {
+                    roleBadge.innerText = 'Team Leader';
+                    roleBadge.className = 'text-xs bg-blue-800 inline-block px-2 py-1 rounded mt-1 border border-blue-600 text-white';
+                    document.getElementById('menu-register').classList.remove('hidden');
+                } else {
+                    roleBadge.innerText = 'Cleaner / Karyawan';
+                    roleBadge.className = 'text-xs bg-green-600 inline-block px-2 py-1 rounded mt-1 border border-green-500 text-white';
+                    document.getElementById('menu-register').classList.add('hidden'); // Karyawan tidak bisa tambah user
+                }
+            }
+            
+            // Reset collage on enter
+            if(viewId === 'collage') {
+                resetCollageState();
+            }
+        }
+
+        // ==========================================
+        // AUTHENTICATION LOGIC
+        // ==========================================
+        function handleLogin() {
+            const user = document.getElementById('login-username').value.toLowerCase();
+            const pass = document.getElementById('login-password').value;
+
+            if(!user || !pass) {
+                showToast("Masukkan username & password!");
+                return;
+            }
+
+            // SIMULASI PHP `SELECT * FROM users WHERE username = ?` & `password_verify()`
+            if(USERS_DB[user] && USERS_DB[user].password === pass) {
+                currentUser = USERS_DB[user];
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                
+                showToast("Login Berhasil!");
+                navigate('dashboard');
+            } else {
+                showToast("Username atau Password Salah!");
+            }
+        }
+
+        function doLogout() {
+            currentUser = null;
+            showToast("Berhasil Logout");
+            navigate('login');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            // Simulasi POST ke PHP untuk register
+            showToast("Berhasil menambahkan karyawan! (Simulasi)");
+            setTimeout(() => { navigate('dashboard'); }, 1500);
+        }
+
+        // ==========================================
+        // COLLAGE MAKER LOGIC (CANVAS API)
+        // ==========================================
+        
+        function setCollageLayout(num) {
+            currentLayout = num;
+            document.getElementById('lbl-img-count').innerText = num;
+            
+            // Update UI styling
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.remove('border-primary', 'bg-blue-50');
+                btn.classList.add('border-gray-200');
+            });
+            document.getElementById('btn-layout-' + num).classList.remove('border-gray-200');
+            document.getElementById('btn-layout-' + num).classList.add('border-primary', 'bg-blue-50');
+            
+            // Clear input
+            document.getElementById('collage-upload').value = '';
+            uploadedImages = [];
+            resetCanvas();
+        }
+
+        function resetCanvas() {
+            const canvas = document.getElementById('collage-canvas');
+            canvas.classList.add('hidden');
+            document.getElementById('canvas-placeholder').style.display = 'block';
+            document.getElementById('btn-save-collage').disabled = true;
+            document.getElementById('btn-save-collage').classList.replace('bg-success', 'bg-gray-300');
+            document.getElementById('btn-save-collage').classList.replace('text-white', 'text-gray-500');
+            document.getElementById('btn-save-collage').classList.add('cursor-not-allowed');
+        }
+
+        function resetCollageState() {
+            setCollageLayout(1);
+            document.getElementById('collage-area').value = '';
+        }
+
+        function handleCollageUpload(event) {
+            const files = event.target.files;
+            if(!files || files.length === 0) return;
+            
+            if(files.length > currentLayout) {
+                showToast(`Peringatan: Layout ini hanya untuk ${currentLayout} foto. Sisa foto akan diabaikan.`);
+            }
+
+            uploadedImages = [];
+            let loadedCount = 0;
+            const maxFiles = Math.min(files.length, currentLayout);
+
+            for(let i=0; i<maxFiles; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        uploadedImages.push(img);
+                        loadedCount++;
+                        if(loadedCount === maxFiles) {
+                            showToast(`${loadedCount} foto berhasil dimuat. Klik "Buat Kolase"`);
+                        }
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        function generateCollage() {
+            if(uploadedImages.length === 0) {
+                showToast("Pilih gambar terlebih dahulu!");
+                return;
+            }
+
+            const canvas = document.getElementById('collage-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Canvas standard 800x800 for high quality export
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // Draw background (white)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            
+            const gap = 15; // padding between images
+
+            // Drawing logic based on layout
+            if(currentLayout === 1) {
+                drawImageProp(ctx, uploadedImages[0], gap, gap, w-(gap*2), h-(gap*2));
+            } 
+            else if(currentLayout === 2) {
+                // Stack vertically
+                const halfH = (h - (gap*3)) / 2;
+                if(uploadedImages[0]) drawImageProp(ctx, uploadedImages[0], gap, gap, w-(gap*2), halfH);
+                if(uploadedImages[1]) drawImageProp(ctx, uploadedImages[1], gap, gap*2 + halfH, w-(gap*2), halfH);
+            }
+            else if(currentLayout === 4) {
+                // 2x2 Grid
+                const halfW = (w - (gap*3)) / 2;
+                const halfH = (h - (gap*3)) / 2;
+                
+                if(uploadedImages[0]) drawImageProp(ctx, uploadedImages[0], gap, gap, halfW, halfH);
+                if(uploadedImages[1]) drawImageProp(ctx, uploadedImages[1], gap*2 + halfW, gap, halfW, halfH);
+                if(uploadedImages[2]) drawImageProp(ctx, uploadedImages[2], gap, gap*2 + halfH, halfW, halfH);
+                if(uploadedImages[3]) drawImageProp(ctx, uploadedImages[3], gap*2 + halfW, gap*2 + halfH, halfW, halfH);
+            }
+
+            // Add Watermark overlay
+            drawWatermark(ctx, w, h);
+
+            // Show canvas
+            document.getElementById('canvas-placeholder').style.display = 'none';
+            canvas.classList.remove('hidden');
+            
+            // Enable save button
+            const btnSave = document.getElementById('btn-save-collage');
+            btnSave.disabled = false;
+            btnSave.classList.replace('bg-gray-300', 'bg-success');
+            btnSave.classList.replace('text-gray-500', 'text-white');
+            btnSave.classList.remove('cursor-not-allowed');
+        }
+
+        // Helper to draw image covering the given area (like CSS object-fit: cover)
+        function drawImageProp(ctx, img, x, y, w, h) {
+            let imgW = img.width, imgH = img.height;
+            let ratio = Math.max(w / imgW, h / imgH);
+            let newW = imgW * ratio;
+            let newH = imgH * ratio;
+            
+            let offsetX = (w - newW) / 2;
+            let offsetY = (h - newH) / 2;
+            
+            // Save state, create clipping mask
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(x, y, w, h);
+            ctx.clip();
+            // Draw
+            ctx.drawImage(img, x + offsetX, y + offsetY, newW, newH);
+            // Restore
+            ctx.restore();
+        }
+
+        function drawWatermark(ctx, w, h) {
+            const area = document.getElementById('collage-area').value || "Area Tidak Ditentukan";
+            const date = new Date();
+            const dateStr = date.toLocaleDateString('id-ID') + " " + date.toLocaleTimeString('id-ID');
+            const userName = currentUser ? currentUser.nama : "User";
+
+            // Watermark Background semi transparent
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(0, h - 140, w, 140);
+            
+            // Watermark Text
+            ctx.fillStyle = '#FFFFFF';
+            
+            // Title
+            ctx.font = 'bold 32px Inter, sans-serif';
+            ctx.fillText("SMART CLEAN HUB", 20, h - 90);
+            
+            // Details
+            ctx.font = '24px Inter, sans-serif';
+            ctx.fillText(`Area : ${area}`, 20, h - 50);
+            
+            ctx.fillStyle = '#F59E0B'; // Accent color for text
+            ctx.font = 'italic 20px Inter, sans-serif';
+            ctx.fillText(`Oleh: ${userName} | ${dateStr}`, 20, h - 20);
+        }
+
+        function saveCollage() {
+            // In a real app, this canvas dataUrl would be sent via POST to PHP
+            // const dataURL = document.getElementById('collage-canvas').toDataURL('image/jpeg', 0.8);
+            
+            const btn = document.getElementById('btn-save-collage');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                showToast("Foto berhasil disimpan ke Spreadsheet (Simulasi API)");
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Tersimpan';
+                btn.classList.replace('bg-success', 'bg-blue-600');
+                setTimeout(() => { navigate('dashboard'); }, 1500);
+            }, 2000);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for mock session, if none show login
+            if(!currentUser) {
+                navigate('login');
+            }
+        });
+    </script>
+</body>
+</html>
