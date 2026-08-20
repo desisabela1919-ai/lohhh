@@ -1,0 +1,104 @@
+:root {
+    --primary-color: #0B3C91; /* Biru Tua Premium */
+    --accent-color: #F59E0B;  /* Oranye Accent */
+    --bg-light: #F4F6F9;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e9ecef;
+    margin: 0;
+    padding: 0;
+}
+
+/* App Canvas Styling for Mobile Experience */
+#app-wrapper {
+    max-width: 450px;
+    margin: 0 auto;
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    padding-bottom: 70px;
+}
+
+.header-bg {
+    background-color: var(--primary-color);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.grid-menu-item {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 6px auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.grid-menu-item:active {
+    transform: scale(0.92);
+}
+
+.grid-menu-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4A5568;
+    display: block;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    background: #ffffff;
+    border-top: 1px solid #E2E8F0;
+    height: 60px;
+    z-index: 1000;
+}
+
+.nav-item {
+    text-align: center;
+    color: #A0AEC0;
+    cursor: pointer;
+    font-size: 0.68rem;
+    font-weight: 500;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* SPA Pages Visibility */
+.page-content {
+    display: none;
+    padding: 15px;
+}
+
+.page-content.active-page {
+    display: block;
+}
+
+/* Badges */
+.badge-role {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
