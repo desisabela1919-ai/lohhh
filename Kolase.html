@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            /* Prevent pull-to-refresh on mobile for app-like feel */
+            overscroll-behavior-y: none;
+        }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .header-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            padding-bottom: 60px; /* Space for the overlapping card */
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+
+        .nav-btn-active {
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .nav-btn-inactive {
+            color: #94a3b8;
+        }
+
+        /* Camera button styling */
+        .camera-btn-wrapper {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 6px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+
+        .camera-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .camera-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Collage Grid Layouts */
+        .collage-grid {
+            display: grid;
+            gap: 4px;
+            width: 100%;
+            aspect-ratio: 1/1; /* Keep it square for the preview */
+            background-color: #e2e8f0;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .collage-item {
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .collage-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Dynamic layout selected state */
+        .layout-option.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        /* Hidden file input */
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* Modal for Camera */
+        #camera-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            flex-direction: column;
+        }
+        #camera-modal.active {
+            display: flex;
+        }
+        #video-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        #video-preview {
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+        }
+        .camera-controls {
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: black;
+        }
+        #capture-btn {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #cbd5e1;
+            cursor: pointer;
+        }
+        #close-camera-btn {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen flex flex-col relative overflow-hidden">
+
+    <!-- Main App Container -->
+    <div id="app-container" class="flex-1 overflow-y-auto pb-24 w-full max-w-md mx-auto bg-white shadow-xl relative">
+        
+        <!-- ==================== VIEW 1: MAIN DASHBOARD ==================== -->
+        <div id="view-dashboard" class="block w-full h-full relative">
+            
+            <!-- Header Section -->
+            <header class="header-bg pt-8 px-6 text-white relative">
+                <!-- User Info -->
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm text-blue-200 mb-1">Selamat Datang,</p>
+                        <h1 class="text-2xl font-bold flex items-center gap-2">
+                            Administrator <span class="text-xl">👋</span>
+                        </h1>
+                        <span class="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded mt-2">Administrator</span>
+                    </div>
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-800 shadow-md">
+                        <i class="fa-solid fa-user text-xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Quote -->
+                <p class="text-blue-100 text-sm italic mt-4 mb-2">
+                    "Kebersihan hari ini menentukan kenyamanan esok."
+                </p>
+            </header>
+
+            <!-- Progress Card (Overlapping header) -->
+            <div class="px-4 -mt-10 relative z-10">
+                <div class="glass-card rounded-2xl p-5 border border-slate-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-bold text-slate-800">Progress Hari Ini</h2>
+                        <span class="font-bold text-blue-700">85%</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 mb-5">
+                        <div class="bg-blue-800 h-2.5 rounded-full" style="width: 85%"></div>
+                    </div>
+                    
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
+                            <p class="text-xl font-bold text-emerald-600">28</p>
+                            <p class="text-xs text-slate-500 mt-1">Selesai</p>
+                        </div>
+                        <div class="bg-rose-50 rounded-xl p-3 text-center border border-rose-100">
+                            <p class="text-xl font-bold text-rose-600">2</p>
+                            <p class="text-xs text-slate-500 mt-1">Belum</p>
+                        </div>
+                        <div class="bg-amber-50 rounded-xl p-3 text-center border border-amber-100">
+                            <p class="text-xl font-bold text-amber-600">3</p>
+                            <p class="text-xs text-slate-500 mt-1">Defect</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Menu -->
+            <div class="px-4 mt-6">
+                <h3 class="font-bold text-slate-800 mb-4 text-lg">Menu Operasional</h3>
+                <div class="grid grid-cols-4 gap-y-6 gap-x-2">
+                    
+                    <!-- Menu Item 1 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Checklist</span>
+                    </div>
+                    
+                    <!-- Menu Item 2 (Kolase) -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer relative" onclick="switchView('view-collage')">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-camera-retro"></i>
+                        </div>
+                        <span class="absolute top-0 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Kolase Foto</span>
+                    </div>
+
+                    <!-- Menu Item 3 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer">
+                        <div class="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-building-circle-exclamation"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Infrastruktur</span>
+                    </div>
+
+                    <!-- Menu Item 4 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer relative">
+                        <div class="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center text-rose-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">3</span>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Defect</span>
+                    </div>
+
+                    <!-- Menu Item 5 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-spray-can"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Chemical</span>
+                    </div>
+
+                    <!-- Menu Item 6 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer">
+                        <div class="w-14 h-14 rounded-2xl bg-slate-200 flex items-center justify-center text-slate-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Polybag</span>
+                    </div>
+
+                    <!-- Menu Item 7 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer">
+                        <div class="w-14 h-14 rounded-2xl bg-yellow-100 flex items-center justify-center text-yellow-600 text-xl shadow-sm">
+                            <i class="fa-regular fa-clipboard"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Catatan</span>
+                    </div>
+
+                    <!-- Menu Item 8 -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center text-teal-600 text-xl shadow-sm">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-600 font-medium text-center">Tambah Tim</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities (Placeholder) -->
+            <div class="px-4 mt-8 mb-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800 text-lg">Aktivitas Terbaru</h3>
+                    <a href="#" class="text-sm text-blue-600 font-medium hover:underline">Lihat Semua</a>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex items-start gap-3">
+                        <div class="bg-emerald-100 text-emerald-600 p-2 rounded-lg">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-800">Lobby Utama Selesai</p>
+                            <p class="text-xs text-slate-500">Oleh: Budi - 10:30 AM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 2: COLLAGE TOOL ==================== -->
+        <div id="view-collage" class="hidden w-full h-full bg-white flex flex-col relative z-20">
+            <!-- Header -->
+            <div class="flex items-center gap-3 p-4 border-b border-slate-200">
+                <button onclick="switchView('view-dashboard')" class="text-slate-600 p-2 hover:bg-slate-100 rounded-full">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <h1 class="text-lg font-semibold text-slate-800">Buat Kolase</h1>
+                <div class="ml-auto flex gap-2">
+                    <button class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-sm font-medium">Kode</button>
+                    <button class="px-3 py-1 bg-slate-800 text-white rounded text-sm font-medium">Pratinjau</button>
+                    <button class="text-slate-600 p-2"><i class="fa-solid fa-share-nodes"></i></button>
+                </div>
+            </div>
+
+            <div class="p-4 overflow-y-auto flex-1">
+                
+                <!-- Dynamic Layout Selection -->
+                <div class="mb-6">
+                    <label class="block font-semibold text-slate-800 mb-2">Jumlah Foto (Layout)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" id="grid-count-input" value="4" min="1" max="16" class="w-20 p-2 border border-slate-300 rounded-lg text-center focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <button onclick="updateCollageLayout()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-200 transition-colors">Terapkan Layout</button>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Pilih jumlah foto yang ingin digabungkan (1-16).</p>
+                </div>
+
+                <!-- Description Input -->
+                <div class="mb-6">
+                    <label class="block font-semibold text-slate-800 mb-2">Area / Deskripsi</label>
+                    <input type="text" placeholder="Cth: Lobby Utama / Before-After Toilet" class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
+                </div>
+
+                <!-- Image Selection Area -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block font-semibold text-slate-800" id="photo-instruction-label">Pilih Gambar (Pilih Foto 1)</label>
+                        <span id="photo-counter" class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded">0/4</span>
+                    </div>
+                    <div class="flex border border-slate-300 rounded-full overflow-hidden p-1 bg-white">
+                        <label for="image-upload" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-full font-medium text-sm cursor-pointer hover:bg-blue-100 transition-colors whitespace-nowrap">
+                            Pilih File
+                        </label>
+                        <input type="file" id="image-upload" accept="image/*" multiple onchange="handleImageUpload(event)">
+                        <span id="file-name-display" class="px-4 py-2 text-slate-500 text-sm flex-1 truncate self-center">Tidak ada file yang dipilih</span>
+                    </div>
+                </div>
+
+                <!-- Collage Preview Area -->
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-2 mb-6 min-h-[300px] flex flex-col items-center justify-center relative bg-slate-50">
+                    
+                    <!-- Dynamic Grid Container -->
+                    <div id="collage-preview-container" class="w-full">
+                        <!-- Initial empty state -->
+                        <div class="text-slate-400 text-center py-20" id="empty-preview-msg">
+                            <i class="fa-regular fa-image text-4xl mb-2"></i>
+                            <p class="text-sm font-medium">Preview Kolase</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-auto pb-4">
+                    <button class="flex-1 bg-amber-500 text-white py-3 rounded-xl font-bold shadow-md shadow-amber-500/30 flex items-center justify-center gap-2 hover:bg-amber-600 transition-colors" onclick="generateCollage()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Buat Kolase
+                    </button>
+                    <button class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold shadow-md shadow-blue-600/30 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" id="btn-save" disabled>
+                        <i class="fa-solid fa-check"></i> Tersimpan
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Bottom Navigation Bar (Fixed relative to the screen, absolute to the body/container) -->
+    <nav class="fixed bottom-0 w-full max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around items-center pt-2 pb-6 px-2 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-50 left-1/2 transform -translate-x-1/2">
+        
+        <div class="flex flex-col items-center gap-1 cursor-pointer nav-btn-active w-16" onclick="switchView('view-dashboard')">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span class="text-[10px]">Beranda</span>
+        </div>
+        
+        <div class="flex flex-col items-center gap-1 cursor-pointer nav-btn-inactive w-16">
+            <i class="fa-regular fa-clipboard text-xl"></i>
+            <span class="text-[10px]">Checklist</span>
+        </div>
+        
+        <!-- Center Camera Button (Modified for device camera access) -->
+        <div class="w-16 relative flex justify-center">
+            <div class="camera-btn-wrapper">
+                <div class="camera-btn" onclick="openCamera()">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col items-center gap-1 cursor-pointer nav-btn-inactive w-16 relative">
+            <i class="fa-regular fa-bell text-xl"></i>
+            <span class="absolute top-0 right-3 w-2 h-2 bg-red-500 rounded-full"></span>
+            <span class="text-[10px]">Notif</span>
+        </div>
+        
+        <div class="flex flex-col items-center gap-1 cursor-pointer nav-btn-inactive w-16">
+            <i class="fa-solid fa-power-off text-xl"></i>
+            <span class="text-[10px]">Keluar</span>
+        </div>
+    </nav>
+
+    <!-- Fullscreen Camera Modal -->
+    <div id="camera-modal">
+        <div id="video-container">
+            <!-- Video element to stream camera feed -->
+            <video id="video-preview" autoplay playsinline></video>
+            <!-- Canvas to capture the frame (hidden) -->
+            <canvas id="capture-canvas" style="display:none;"></canvas>
+            
+            <div class="absolute top-4 right-4 bg-black/50 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer" onclick="closeCamera()">
+                <i class="fa-solid fa-xmark text-white text-xl"></i>
+            </div>
+        </div>
+        
+        <div class="camera-controls pb-8">
+            <div class="w-10"></div> <!-- spacer -->
+            <div id="capture-btn" onclick="takePhoto()"></div>
+            <div class="w-10 text-white text-center cursor-pointer" onclick="switchCamera()">
+                <i class="fa-solid fa-rotate text-xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Notification (Toast) -->
+    <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium transition-opacity duration-300 opacity-0 pointer-events-none z-[1001] flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-blue-400"></i>
+        <span id="toast-message">Message</span>
+    </div>
+
+    <script>
+        // --- View Switching Logic ---
+        function switchView(viewId) {
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-collage').classList.add('hidden');
+            
+            document.getElementById(viewId).classList.remove('hidden');
+            document.getElementById(viewId).classList.add('block');
+        }
+
+        // --- Toast Notification Logic ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // --- Dynamic Collage Logic ---
+        let currentPhotos = [];
+        let requiredPhotos = 4; // Default based on input
+
+        function updateCollageLayout() {
+            const inputVal = parseInt(document.getElementById('grid-count-input').value);
+            
+            if (isNaN(inputVal) || inputVal < 1) {
+                showToast("Jumlah foto minimal 1");
+                document.getElementById('grid-count-input').value = 1;
+                requiredPhotos = 1;
+            } else if (inputVal > 16) {
+                showToast("Maksimal 16 foto untuk performa terbaik");
+                document.getElementById('grid-count-input').value = 16;
+                requiredPhotos = 16;
+            } else {
+                requiredPhotos = inputVal;
+            }
+
+            // Reset current photos when layout changes
+            currentPhotos = [];
+            document.getElementById('image-upload').value = '';
+            document.getElementById('file-name-display').innerText = 'Tidak ada file yang dipilih';
+            
+            renderCollageGrid();
+            updateUIAfterSelection();
+            showToast(`Layout diperbarui untuk ${requiredPhotos} foto`);
+        }
+
+        function calculateGridTemplate(count) {
+            // Simple algorithm to find square-ish grid
+            let cols = Math.ceil(Math.sqrt(count));
+            let rows = Math.ceil(count / cols);
+            return { cols, rows };
+        }
+
+        function renderCollageGrid() {
+            const container = document.getElementById('collage-preview-container');
+            const msg = document.getElementById('empty-preview-msg');
+            
+            // Remove existing grid instead of clearing entire innerHTML to preserve msg element
+            const existingGrid = container.querySelector('.collage-grid');
+            if (existingGrid) {
+                existingGrid.remove();
+            }
+
+            if (currentPhotos.length === 0) {
+                if (msg) msg.style.display = 'block';
+                return;
+            }
+
+            if (msg) msg.style.display = 'none';
+            
+            // Create Grid container
+            const grid = document.createElement('div');
+            grid.className = 'collage-grid';
+            
+            const dimensions = calculateGridTemplate(requiredPhotos);
+            grid.style.gridTemplateColumns = `repeat(${dimensions.cols}, 1fr)`;
+            grid.style.gridTemplateRows = `repeat(${dimensions.rows}, 1fr)`;
+
+            // Fill slots
+            for (let i = 0; i < requiredPhotos; i++) {
+                const item = document.createElement('div');
+                item.className = 'collage-item';
+                
+                if (i < currentPhotos.length) {
+                    const img = document.createElement('img');
+                    img.src = currentPhotos[i];
+                    item.appendChild(img);
+                } else {
+                    item.innerText = `Foto ${i + 1}`;
+                }
+                grid.appendChild(item);
+            }
+
+            container.appendChild(grid);
+        }
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            let filesAdded = 0;
+            
+            // Read files (up to the limit needed)
+            for (let i = 0; i < files.length; i++) {
+                if (currentPhotos.length >= requiredPhotos) break;
+                
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentPhotos.push(e.target.result);
+                    renderCollageGrid();
+                    updateUIAfterSelection();
+                };
+                reader.readAsDataURL(file);
+                filesAdded++;
+            }
+            
+            if (filesAdded > 0) {
+                 document.getElementById('file-name-display').innerText = `${filesAdded} file ditambahkan (Total: ${currentPhotos.length})`;
+            }
+        }
+
+        function updateUIAfterSelection() {
+            const counter = document.getElementById('photo-counter');
+            const instruction = document.getElementById('photo-instruction-label');
+            const btnSave = document.getElementById('btn-save');
+            
+            counter.innerText = `${currentPhotos.length}/${requiredPhotos}`;
+            
+            if (currentPhotos.length < requiredPhotos) {
+                instruction.innerText = `Pilih Gambar (Pilih Foto ${currentPhotos.length + 1})`;
+                btnSave.classList.add('opacity-50', 'cursor-not-allowed');
+                btnSave.disabled = true;
+            } else {
+                instruction.innerText = "Semua foto telah dipilih";
+                instruction.classList.add('text-emerald-600');
+                btnSave.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnSave.classList.add('hover:bg-blue-700');
+                btnSave.disabled = false;
+            }
+        }
+
+        async function generateCollage() {
+            if (currentPhotos.length === 0) {
+                showToast("Pilih minimal 1 foto terlebih dahulu");
+                return;
+            }
+            
+            showToast("Memproses kolase...");
+            
+            // Create a hidden canvas to draw the collage
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size (e.g., 1000x1000 for high res square)
+            const canvasSize = 1000;
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+            
+            // Fill background with white
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const dimensions = calculateGridTemplate(requiredPhotos);
+            const gap = 10; // Gap between images in pixels
+            
+            // Calculate individual cell width and height
+            const cellWidth = (canvas.width - (gap * (dimensions.cols + 1))) / dimensions.cols;
+            const cellHeight = (canvas.height - (gap * (dimensions.rows + 1))) / dimensions.rows;
+            
+            // Helper function to load image asynchronously
+            const loadImage = (src) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = src;
+                });
+            };
+
+            try {
+                // Draw each photo onto the canvas
+                for (let i = 0; i < currentPhotos.length; i++) {
+                    const img = await loadImage(currentPhotos[i]);
+                    
+                    const col = i % dimensions.cols;
+                    const row = Math.floor(i / dimensions.cols);
+                    
+                    const x = gap + (col * (cellWidth + gap));
+                    const y = gap + (row * (cellHeight + gap));
+                    
+                    // Simple object-fit: cover implementation for canvas drawing
+                    const imgRatio = img.width / img.height;
+                    const cellRatio = cellWidth / cellHeight;
+                    
+                    let drawWidth = cellWidth;
+                    let drawHeight = cellHeight;
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    
+                    if (imgRatio > cellRatio) {
+                        // Image is wider than cell, crop width
+                        drawWidth = img.height * cellRatio;
+                        offsetX = (img.width - drawWidth) / 2;
+                        drawHeight = img.height;
+                    } else {
+                        // Image is taller than cell, crop height
+                        drawHeight = img.width / cellRatio;
+                        offsetY = (img.height - drawHeight) / 2;
+                        drawWidth = img.width;
+                    }
+
+                    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight, x, y, cellWidth, cellHeight);
+                }
+
+                // Add description text if provided
+                const description = document.querySelector('input[placeholder="Cth: Lobby Utama / Before-After Toilet"]').value;
+                if (description) {
+                    // Create a semi-transparent banner at the bottom
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                    ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+                    
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 24px Inter, sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(description, canvas.width / 2, canvas.height - 30);
+                }
+
+                // Convert canvas to data URL and download
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                saveToGallery(dataUrl, 'Kolase');
+                
+                showToast("Kolase berhasil dibuat dan disimpan!");
+                
+                // Update button state
+                const btnSave = document.getElementById('btn-save');
+                btnSave.disabled = false;
+                btnSave.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnSave.innerHTML = '<i class="fa-solid fa-check"></i> Tersimpan';
+                
+            } catch (error) {
+                console.error("Error generating collage:", error);
+                showToast("Gagal membuat kolase.");
+            }
+        }
+
+
+        // --- STREAMING_CHUNK:Camera Access Logic ---
+        const cameraModal = document.getElementById('camera-modal');
+        const videoElement = document.getElementById('video-preview');
+        const canvasElement = document.getElementById('capture-canvas');
+        let currentStream = null;
+        let useFrontCamera = false; // Default rear camera
+
+        async function initCamera() {
+            if (currentStream) {
+                stopCameraTracks();
+            }
+
+            const constraints = {
+                video: {
+                    facingMode: useFrontCamera ? "user" : "environment",
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            };
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                currentStream = stream;
+                videoElement.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                showToast("Gagal mengakses kamera. Periksa izin browser Anda.");
+                closeCamera();
+            }
+        }
+
+        function stopCameraTracks() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+        }
+
+        function openCamera() {
+            // Check if device supports getUserMedia
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast("API Kamera tidak didukung di browser ini.");
+                return;
+            }
+            cameraModal.classList.add('active');
+            initCamera();
+        }
+
+        function closeCamera() {
+            cameraModal.classList.remove('active');
+            stopCameraTracks();
+        }
+
+        function switchCamera() {
+            useFrontCamera = !useFrontCamera;
+            initCamera();
+        }
+
+        function takePhoto() {
+            if (!currentStream) return;
+
+            // Flash effect
+            const originalBg = document.getElementById('video-container').style.background;
+            document.getElementById('video-container').style.background = 'white';
+            videoElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('video-container').style.background = originalBg;
+                videoElement.style.opacity = '1';
+            }, 100);
+
+            // Capture frame to canvas
+            const context = canvasElement.getContext('2d');
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+            context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+            // Convert to Image URL
+            const imageDataUrl = canvasElement.toDataURL('image/jpeg', 0.9);
+
+            // Simulate saving to gallery by downloading the image
+            saveToGallery(imageDataUrl);
+            
+            closeCamera();
+        }
+
+        function saveToGallery(dataUrl) {
+            // Create a temporary link element to trigger download
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            
+            // Generate filename based on timestamp
+            const date = new Date();
+            const timestamp = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
+            link.download = `Caretaker_Capture_${timestamp}.jpg`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("Foto disimpan ke galeri perangkat!");
+        }
+
+        // --- STREAMING_CHUNK:Modified saveToGallery to accept prefix ---
+        function saveToGallery(dataUrl, prefix = 'Capture') {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            
+            const date = new Date();
+            const timestamp = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
+            link.download = `Caretaker_${prefix}_${timestamp}.jpg`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize state on load
+        updateCollageLayout();
+    </script>
+</body>
+</html>
